@@ -1,18 +1,23 @@
 plugins {
     id 'java'
+    id 'application'
 }
 
 def ver = [
-        spring: '5.3.9',
+        spring    : '5.3.10',
         servletAPI: '4.0.1',
-        junit: '5.7.2',
-        slf4j: '1.7.32',
-        log4j2: '2.14.1'
+        tomcat    : '9.0.53',
+        commonIO  : '2.11.0',
+        junit     : '5.8.0',
+        slf4j     : '1.7.32',
+        log4j2    : '2.14.1'
 ]
 
 group 'com.flab'
 version '1.0-SNAPSHOT'
-sourceCompatibility = '16'
+sourceCompatibility = '17'
+targetCompatibility = '17'
+mainClassName = 'com.flab.planb.ApplicationLauncher'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 repositories {
@@ -23,21 +28,18 @@ dependencies {
     compileOnly "javax.servlet:javax.servlet-api:${ver.servletAPI}"
     compileOnly "org.apache.logging.log4j:log4j-api:${ver.log4j2}"
     compileOnly "org.apache.logging.log4j:log4j-core:${ver.log4j2}"
-    compileOnly "org.apache.logging.log4j:log4j-slf4j-impl:${ver.log4j2}"
-    implementation "org.apache.logging.log4j:log4j-web:${ver.log4j2}"
-    implementation "org.slf4j:log4j-over-slf4j:${ver.slf4j}"
-    implementation "org.slf4j:slf4j-api:${ver.slf4j}"
-    implementation "org.springframework:spring-core:${ver.spring}"
-    implementation "org.springframework:spring-web:${ver.spring}"
+    compileOnly "org.slf4j:slf4j-api:${ver.slf4j}"
+    compileOnly "org.slf4j:jul-to-slf4j:${ver.slf4j}"
+    compileOnly "org.slf4j:jcl-over-slf4j:${ver.slf4j}"
+    compileOnly "org.slf4j:log4j-over-slf4j:${ver.slf4j}"
+    implementation "commons-io:commons-io:${ver.commonIO}"
+    implementation "org.apache.logging.log4j:log4j-slf4j-impl:${ver.log4j2}"
+    implementation "org.apache.tomcat.embed:tomcat-embed-core:${ver.tomcat}"
+    implementation "org.apache.tomcat.embed:tomcat-embed-jasper:${ver.tomcat}"
     implementation "org.springframework:spring-webmvc:${ver.spring}"
-    implementation "org.springframework:spring-context:${ver.spring}"
-    implementation "org.springframework:spring-aop:${ver.spring}"
-    implementation "org.springframework:spring-jdbc:${ver.spring}"
-    implementation "org.springframework:spring-beans:${ver.spring}"
-    implementation "org.springframework:spring-tx:${ver.spring}"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${ver.junit}"
     testImplementation "org.springframework:spring-test:${ver.spring}"
     testImplementation "org.junit.jupiter:junit-jupiter-api:${ver.junit}"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${ver.junit}"
 }
 
 test {
