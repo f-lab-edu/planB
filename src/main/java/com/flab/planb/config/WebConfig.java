@@ -1,5 +1,6 @@
 package com.flab.planb.config;
 
+import com.flab.planb.global.GlobalMethods;
 import java.util.Optional;
 import javax.servlet.Filter;
 import org.springframework.web.filter.CharacterEncodingFilter;
@@ -25,7 +26,8 @@ public class WebConfig extends AbstractAnnotationConfigDispatcherServletInitiali
     @Override
     protected Filter[] getServletFilters() {
         CharacterEncodingFilter encodingFilter = new CharacterEncodingFilter(
-            Optional.ofNullable(System.getProperty("encoding")).orElse("UTF-8"), true, true);
+            Optional.ofNullable(System.getProperty("encoding")).orElse(
+                GlobalMethods.getDefaultEncToString()), true, true);
         return new Filter[]{encodingFilter};
     }
 }

@@ -1,5 +1,6 @@
 package com.flab.planb;
 
+import com.flab.planb.global.GlobalMethods;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -22,7 +23,8 @@ public class ApplicationLauncher {
         Optional.ofNullable(System.getProperty("port")).orElse("8080"));
 
     public static void main(String[] args) {
-        String encoding = Optional.ofNullable(System.getProperty("encoding")).orElse("UTF-8");
+        String encoding = Optional.ofNullable(System.getProperty("encoding"))
+            .orElse(GlobalMethods.getDefaultEncToString());
         String appBase = ".";
         Tomcat tomcat = new Tomcat();
         tomcat.setBaseDir(createTempDir());
