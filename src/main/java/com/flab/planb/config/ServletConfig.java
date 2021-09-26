@@ -1,13 +1,12 @@
 package com.flab.planb.config;
 
-import com.flab.planb.global.GlobalMethods;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -15,7 +14,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @EnableWebMvc
 @Configuration
-@ComponentScan(basePackages = {"com.flab.planb"})
+@ComponentScan(basePackages = {"com.flab.planb.controller"})
 public class ServletConfig implements WebMvcConfigurer {
 
     @Override
@@ -25,12 +24,11 @@ public class ServletConfig implements WebMvcConfigurer {
 
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        WebMvcConfigurer.super.configureMessageConverters(converters);
-        StringHttpMessageConverter stringConverter = new StringHttpMessageConverter();
-        stringConverter.setSupportedMediaTypes(
-            Arrays.asList(
-                new MediaType("text", "plain", GlobalMethods.getDefaultEncToCharacter())));
-        converters.add(stringConverter);
+        MappingJackson2HttpMessageConverter jacksonConverter = new MappingJackson2HttpMessageConverter();
+        List<MediaType> mediaTypes = new ArrayList<>();
+        mediaTypes.add(MediaType.APPLICATION_JSON);
+        jacksonConverter.setSupportedMediaTypes(mediaTypes);
+        converters.add(jacksonConverter);
     }
 
     @Override

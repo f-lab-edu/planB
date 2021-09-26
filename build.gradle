@@ -16,7 +16,8 @@ def ver = [
         hikari        : '5.0.0',
         mybatis       : '3.5.7',
         mybatisSpring : '2.0.6',
-        mysql         : '8.0.26'
+        mysql         : '8.0.26',
+        jackson       : '2.12.5'
 ]
 
 group 'com.flab'
@@ -31,6 +32,7 @@ repositories {
 }
 
 dependencies {
+    implementation 'junit:junit:4.13.1'
     compileOnly "javax.servlet:javax.servlet-api:${ver.servletAPI}"
     compileOnly "org.apache.logging.log4j:log4j-api:${ver.log4j2}"
     compileOnly "org.apache.logging.log4j:log4j-core:${ver.log4j2}"
@@ -51,6 +53,7 @@ dependencies {
     implementation "org.mybatis:mybatis:${ver.mybatis}"
     implementation "org.mybatis:mybatis-spring:${ver.mybatisSpring}"
     implementation "mysql:mysql-connector-java:${ver.mysql}"
+    implementation "com.fasterxml.jackson.core:jackson-databind:${ver.jackson}"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${ver.junit}"
     testImplementation "org.springframework:spring-test:${ver.spring}"
     testImplementation "org.junit.jupiter:junit-jupiter-api:${ver.junit}"
