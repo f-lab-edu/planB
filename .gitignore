@@ -35,3 +35,9 @@ hs_err_pid*
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+.classpath
+.project
+.settings/
+
+# properties #
+datasource.properties
