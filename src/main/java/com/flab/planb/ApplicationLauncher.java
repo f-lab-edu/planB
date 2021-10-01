@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Optional;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.Tomcat;
@@ -19,45 +18,42 @@ import org.slf4j.LoggerFactory;
 public class ApplicationLauncher {
 
     private static final Logger log = LoggerFactory.getLogger(ApplicationLauncher.class);
-    private static final int PORT = Integer.parseInt(
-        Optional.ofNullable(System.getProperty("port")).orElse("8080"));
+    private static final int PORT = Integer.parseInt(System.getProperty("port", "8080"));
+    private static final String APP_BASE = ".";
+    private static final String PREFIX = "tomcat.";
+    private static final String ROOT_PATH = "user.dir";
 
     public static void main(String[] args) {
-        String encoding = Optional.ofNullable(System.getProperty("encoding"))
-            .orElse(GlobalMethods.getDefaultEncToString());
-        String appBase = ".";
         Tomcat tomcat = new Tomcat();
         tomcat.setBaseDir(createTempDir());
         tomcat.setPort(PORT);
-        tomcat.getHost().setAppBase(appBase);
-        Context context = tomcat.addWebapp("", appBase);
+        tomcat.getHost().setAppBase(APP_BASE);
+        Context context = tomcat.addWebapp("", APP_BASE);
         context.setReloadable(true);
-        context.setRequestCharacterEncoding(encoding);
-        context.setResponseCharacterEncoding(encoding);
+        context.setRequestCharacterEncoding(GlobalMethods.encoding);
+        context.setResponseCharacterEncoding(GlobalMethods.encoding);
         tomcat.getConnector();
         try {
             tomcat.start();
+            tomcat.getServer().await();
         } catch (LifecycleException le) {
-            throw new RuntimeException("톰캣 start 실패", le);
+            log.error("톰캣 start 실패", le);
         }
-        tomcat.getServer().await();
     }
 
     private static String createTempDir() {
         try {
-            String prefix = "tomcat.";
-            String rootPath = "user.dir";
-            deleteDirectory(Paths.get(System.getProperty(rootPath)).toFile(),
-                new PrefixFileFilter(prefix, IOCase.SENSITIVE));
-            Path tempPath = Files.createTempDirectory(Paths.get(System.getProperty(rootPath)),
-                prefix);
+            deleteDirectory(Paths.get(System.getProperty(ROOT_PATH)).toFile(),
+                new PrefixFileFilter(PREFIX, IOCase.SENSITIVE));
+            Path tempPath = Files.createTempDirectory(Paths.get(System.getProperty(ROOT_PATH)),
+                PREFIX);
             File tempFile = tempPath.toFile();
             tempFile.deleteOnExit();
 
             return tempFile.getAbsolutePath();
         } catch (IOException ex) {
-            throw new RuntimeException(
-                "temp 디렉터리 생성 실패. java.io.tmpdir 위치 : " + System.getProperty("java.io.tmpdir"), ex);
+            log.error("temp 디렉터리 생성 실패", ex);
+            throw new NullPointerException("absolutePath가 null이므로 톰캣 start 중지");
         }
     }
 
