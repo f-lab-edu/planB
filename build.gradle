@@ -9,7 +9,7 @@ def ver = [
         servletAPI    : '4.0.1',
         tomcat        : '9.0.53',
         commonIO      : '2.11.0',
-        junit         : '5.8.0',
+        junit         : '5.8.1',
         slf4j         : '1.7.32',
         log4j2        : '2.14.1',
         lombok        : '1.18.20',
@@ -32,7 +32,6 @@ repositories {
 }
 
 dependencies {
-    implementation 'junit:junit:4.13.1'
     compileOnly "javax.servlet:javax.servlet-api:${ver.servletAPI}"
     compileOnly "org.apache.logging.log4j:log4j-api:${ver.log4j2}"
     compileOnly "org.apache.logging.log4j:log4j-core:${ver.log4j2}"
