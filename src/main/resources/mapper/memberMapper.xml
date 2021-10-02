@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flab.planb.mapper.MemberMapper">
+  <insert id="signUp" parameterType="com.flab.planb.dto.member.MemberDTO">
+    insert into tbl_members
+      (id, passwd, nickname, tel, email)
+    values (#{id}, #{passwd}, #{nickname}, #{tel}, #{email})
+  </insert>
+</mapper>
