@@ -1,62 +1,74 @@
 package com.flab.planb.service;
 
-import com.flab.planb.config.DBConfig;
-import com.flab.planb.config.RootConfig;
-import com.flab.planb.config.SecurityConfig;
 import com.flab.planb.dto.member.MemberDTO;
+import com.flab.planb.service.mapper.MemberMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-@WebAppConfiguration
-@ExtendWith({SpringExtension.class})
-@Transactional
-@ContextConfiguration(classes = {RootConfig.class, DBConfig.class, SecurityConfig.class})
+@ExtendWith({MockitoExtension.class})
 class MemberServiceUnitTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(MemberServiceUnitTest.class);
-
-    @Autowired
+    @Mock
+    private PasswordEncoder passwordEncoder;
+    @Mock
+    private MemberMapper memberMapper;
+    @InjectMocks
     private MemberService memberService;
-    private MemberDTO member;
 
     @BeforeEach
-    void setUp() {
-        member = MemberDTO.builder().userId("test").nickname("테스트").passwd("test1234").tel("01012345678").build();
+    void setUp() {}
+
+    @Test
+    @DisplayName("MemberId 개수 확인")
+    void test_countByMemberId() throws Exception {
+        int checkCouunt = 1;
+        // given
+        Mockito.when(memberMapper.countByMemberId(ArgumentMatchers.anyString()))
+               .thenReturn(checkCouunt);
+        // when
+        int memberIdCount = memberService.countByMemberId(ArgumentMatchers.anyString());
+        // then
+        Assertions.assertEquals(checkCouunt, memberIdCount);
     }
 
     @Test
-    @DisplayName("사용자 추가 서비스 테스트")
-    void insertMemberInfoTest() {
-        memberService.insertMemberInfo(member);
-        assertEquals(1, memberService.selectUserIdCount("test"));
+    @DisplayName("Nickname 개수 확인")
+    void test_countByNickName() throws Exception {
+        int checkCouunt = 1;
+        // given
+        Mockito.when(memberMapper.countByNickName(ArgumentMatchers.anyString()))
+               .thenReturn(checkCouunt);
+        // when
+        int nickNameCount = memberService.countByNickName(ArgumentMatchers.anyString());
+        // then
+        Assertions.assertEquals(checkCouunt, nickNameCount);
     }
 
     @Test
-    @DisplayName("사용 중인 ID 확인 서비스 테스트")
-    void selectUserIdCountTest() {
-        assertEquals(0, memberService.selectUserIdCount("test2"));
-
-        memberService.insertMemberInfo(member);
-        assertEquals(1, memberService.selectUserIdCount("test"));
+    @DisplayName("회원가입")
+    void test_saveMemberInfo() throws Exception {
+        int checkCouunt = 1;
+        // given
+        MemberDTO memberDTO = MemberDTO.builder()
+                                       .memberId("memberTest").nickname("멤버테스트")
+                                       .passwd("test1234").tel("01012345678")
+                                       .build();
+        // when
+        memberService.saveMemberInfo(memberDTO);
+        // then
+        Mockito.verify(memberMapper).saveMemberInfo(memberDTO);
     }
 
-    @Test
-    @DisplayName("사용 중인 닉네임 확인 서비스 테스트")
-    void selectNickNameCountTest() {
-        assertEquals(0, memberService.selectNickNameCount("테스터2"));
-
-        memberService.insertMemberInfo(member);
-        assertEquals(1, memberService.selectNickNameCount("테스터"));
-    }
 }

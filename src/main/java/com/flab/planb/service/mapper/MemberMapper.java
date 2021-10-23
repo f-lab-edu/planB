@@ -6,10 +6,10 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface MemberMapper {
 
-  void insertMemberInfo(MemberDTO memberDTO);
+    void saveMemberInfo(MemberDTO memberDTO);
 
-  int selectMemberIdCount(String memberId);
+    int countByMemberId(String memberId);
 
-  int selectNickNameCount(String nickName);
+    int countByNickName(String nickName);
 
 }

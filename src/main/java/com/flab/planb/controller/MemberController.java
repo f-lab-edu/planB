@@ -1,106 +1,93 @@
 package com.flab.planb.controller;
 
-import com.flab.planb.common.Common;
+import com.flab.planb.common.MessageLookup;
 import com.flab.planb.dto.member.MemberDTO;
 import com.flab.planb.message.MessageCode;
 import com.flab.planb.message.ResponseMessage;
-import com.flab.planb.message.SucceedMessage;
 import com.flab.planb.service.MemberService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import java.util.HashMap;
-import java.util.Objects;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import java.util.Map;
 
+@RequiredArgsConstructor
 @RestController
 @Slf4j
 @RequestMapping("/members")
 public class MemberController {
 
-  private final MemberService memberService;
+    private final MemberService memberService;
+    private final MessageLookup messageLookup;
+    private final String validKey = MessageCode.VALID_OVERLAP.getMessageKey();
+    private final String validCode = MessageCode.VALID_OVERLAP.getMessageCode();
 
-  public MemberController(MemberService memberService) {
-    this.memberService = memberService;
-  }
-
-  @GetMapping("/member-id/{memberId}/existence")
-  public ResponseEntity<ResponseMessage> isExistMemberId(
-      @PathVariable("memberId") @NotBlank String memberId) {
-    String resultParamName = "none";
-    String messageKey = "text.id";
-
-    log.debug("memberId : " + memberId);
-
-    return setResponseEntity(checkMemberId(memberId),
-        MessageCode.VAID_OVERLAP, MessageCode.VALID_SUCCEED,
-        resultParamName, messageKey);
-  }
-
-  @GetMapping("/nickname/{nickname}/existence")
-  public ResponseEntity<ResponseMessage> isExistNickname(
-      @PathVariable("nickname") @NotBlank String nickname) {
-    String resultParamName = "none";
-    String messageKey = "text.nickname";
-
-    log.debug("nickname : " + nickname);
-
-    return setResponseEntity(checkNickname(nickname),
-        MessageCode.VAID_OVERLAP, MessageCode.VALID_SUCCEED,
-        resultParamName, messageKey);
-  }
-
-  @PostMapping("")
-  public ResponseEntity<ResponseMessage> signUp(@RequestBody @Valid MemberDTO memberDTO) {
-    String resultParamName = "succeed";
-    String messageKey = "";
-
-    log.debug(memberDTO.toString());
-
-    if (!checkMemberId(memberDTO.getMemberId()) || !checkNickname(memberDTO.getNickname())) {
-      return setResponseEntity(false,
-          MessageCode.INSERT_FAIL_DATA, MessageCode.INSERT_SUCCEED,
-          resultParamName, messageKey);
+    @GetMapping(value = "/member-id")
+    public ResponseEntity<?> isExistMemberId(
+        @RequestParam("check") @NotBlank String memberId) {
+        return isCountByMemberIdZero(memberId) ? setSucceed(
+            MessageCode.VALID_SUCCEED.getMessageKey())
+                                               : setFail(validKey, "text.id", validCode);
     }
 
-    memberService.insertMemberInfo(memberDTO);
-
-    return setResponseEntity(true,
-        MessageCode.INSERT_FAIL_DATA, MessageCode.INSERT_SUCCEED,
-        resultParamName, messageKey);
-  }
-
-  private boolean checkMemberId(String sqlParameter) {
-    return memberService.selectMemberIdCount(sqlParameter) == 0;
-  }
-
-  private boolean checkNickname(String sqlParameter) {
-    return memberService.selectNickNameCount(sqlParameter) == 0;
-  }
-
-  private ResponseEntity<ResponseMessage> setResponseEntity(boolean isTrue,
-      MessageCode failMessageCode, MessageCode succeedMessageCode,
-      String resultParameterName, String messageKey) {
-    HashMap<String, Object> hashMap = new HashMap<>();
-    hashMap.put(resultParameterName, isTrue);
-    failMessageCode =
-        Objects.isNull(failMessageCode) ? MessageCode.INSERT_FAIL_DATA : failMessageCode;
-    succeedMessageCode =
-        Objects.isNull(succeedMessageCode) ? MessageCode.INSERT_SUCCEED : succeedMessageCode;
-
-    if (!isTrue) {
-      String[] messageReplace = {Common.getMessage(messageKey)};
-
-      return ResponseEntity.ok(new SucceedMessage(failMessageCode, messageReplace, hashMap));
+    @GetMapping(value = "/nickname")
+    public ResponseEntity<?> isExistNickname(
+        @RequestParam("check") @NotBlank String nickname) {
+        return isCountByNickNameZero(nickname) ? setSucceed(
+            MessageCode.VALID_SUCCEED.getMessageKey())
+                                               : setFail(validKey, "text.nickname", validCode);
     }
 
-    return ResponseEntity.ok(new SucceedMessage(succeedMessageCode, hashMap));
-  }
+    @PostMapping("")
+    public ResponseEntity<?> signUp(@RequestBody @Valid MemberDTO memberDTO) {
+        log.debug(memberDTO.toString());
+
+        if (!isCountByMemberIdZero(memberDTO.getMemberId())
+            || !isCountByNickNameZero(memberDTO.getNickname())) {
+            return setFail(
+                MessageCode.INSERT_FAIL_DATA.getMessageKey(),
+                null,
+                MessageCode.INSERT_FAIL_DATA.getMessageCode()
+            );
+        }
+
+        memberService.saveMemberInfo(memberDTO);
+
+        return setSucceed(MessageCode.INSERT_SUCCEED.getMessageKey());
+    }
+
+    private boolean isCountByMemberIdZero(String sqlParameter) {
+        return memberService.countByMemberId(sqlParameter) == 0;
+    }
+
+    private boolean isCountByNickNameZero(String sqlParameter) {
+        return memberService.countByNickName(sqlParameter) == 0;
+    }
+
+    private ResponseEntity<?> setFail(String messageKey, String messageArg, String messageCode) {
+        return ResponseEntity.badRequest().body(
+            ResponseMessage.builder().statusMessage(
+                messageLookup.getMessage(
+                    messageKey,
+                    messageLookup.getMessage(messageArg)
+                )
+            ).data(Map.of("errorCode", messageCode)).build()
+        );
+    }
+
+    private ResponseEntity<?> setSucceed(String messageKey) {
+        return ResponseEntity.ok(
+            ResponseMessage.builder()
+                           .statusMessage(messageLookup.getMessage(messageKey))
+                           .build()
+        );
+    }
 
 }

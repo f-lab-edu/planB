@@ -4,21 +4,21 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.flab.planb.service.mapper.MemberMapper">
   <!-- 사용자 기본 회원정보 추가 -->
-  <insert id="insertMemberInfo" parameterType="com.flab.planb.dto.member.MemberDTO">
+  <insert id="saveMemberInfo" parameterType="com.flab.planb.dto.member.MemberDTO">
     insert into planb.tbl_members
-      (user_id, passwd, nickname, tel, email)
-    values (#{userId}, #{passwd}, #{nickname}, #{tel}, #{email})
+      (member_id, passwd, nickname, tel, email)
+    values (#{memberId}, #{passwd}, #{nickname}, #{tel}, #{email})
   </insert>
   <!-- 사용 중인 ID인지 확인 -->
-  <select id="selectUserIdCount" parameterType="string" resultType="int">
+  <select id="countByMemberId" parameterType="string" resultType="int">
     select count(*)
     from planb.tbl_members
-    where user_id = '${userId}'
+    where member_id = #{memberId}
   </select>
   <!-- 사용 중인 닉네임인지 확인 -->
-  <select id="selectNickNameCount" parameterType="string" resultType="int">
+  <select id="countByNickName" parameterType="string" resultType="int">
     select count(*)
     from planb.tbl_members
-    where nickname = '${npckName}'
+    where nickname = #{nickName}
   </select>
 </mapper>
