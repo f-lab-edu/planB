@@ -34,5 +34,5 @@ public class MemberDTO {
     @NotBlank(message = "전화번호는 Null과 공백이 아닌 값이 들어가야 합니다.")
     private String tel;
     private String email;
-    
+
 }

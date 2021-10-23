@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
         @ComponentScan.Filter(type = FilterType.ANNOTATION, value = Configuration.class)
     }
 )
+
 public class RootConfig {
 
   @Bean
