@@ -2,7 +2,7 @@ package com.flab.planb.config;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import javax.sql.DataSource;
+import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
@@ -15,25 +15,23 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import javax.sql.DataSource;
 
+@RequiredArgsConstructor
+@Configuration
 @EnableTransactionManagement
 @PropertySource({"classpath:properties/datasource.properties"})
-@Configuration
-@MapperScan(basePackages = {"com.flab.planb.mapper"})
+@MapperScan(basePackages = {"com.flab.planb.service.mapper"})
 public class DBConfig {
 
     @Value("${spring.datasource.driver-class-name}")
     private String driverClassName;
-
     @Value("${spring.datasource.url}")
     private String url;
-
     @Value("${spring.datasource.username}")
     private String userName;
-
     @Value("${spring.datasource.password}")
     private String password;
-
     @Value("${spring.datasource.max-pool-size}")
     private int maxPoolSize;
 
@@ -73,4 +71,5 @@ public class DBConfig {
         sessionFactory.setDataSource(dataSource);
         return sessionFactory.getObject();
     }
+
 }

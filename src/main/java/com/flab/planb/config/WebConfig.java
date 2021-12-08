@@ -1,9 +1,9 @@
 package com.flab.planb.config;
 
-import com.flab.planb.global.GlobalMethods;
-import javax.servlet.Filter;
+import com.flab.planb.common.MessageLookup;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
+import javax.servlet.Filter;
 
 public class WebConfig extends AbstractAnnotationConfigDispatcherServletInitializer {
 
@@ -24,8 +24,13 @@ public class WebConfig extends AbstractAnnotationConfigDispatcherServletInitiali
 
     @Override
     protected Filter[] getServletFilters() {
-        CharacterEncodingFilter encodingFilter = new CharacterEncodingFilter(GlobalMethods.encoding,
-            true, true);
+        CharacterEncodingFilter encodingFilter = new CharacterEncodingFilter(
+            MessageLookup.ENCODIG,
+            true,
+            true
+        );
+
         return new Filter[]{encodingFilter};
     }
+
 }

@@ -1,12 +1,10 @@
-package com.flab.planb.config;
+package com.flab.planb.server;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
-@PropertySource({"classpath:properties/application.properties"})
 @Configuration
+@PropertySource({"classpath:properties/application.properties"})
 @ComponentScan(basePackages = {"com.flab.planb.server"})
-public class ServerConfig {
-
-}
+public class ServerConfig {}
