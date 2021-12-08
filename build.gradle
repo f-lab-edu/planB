@@ -12,7 +12,7 @@ def ver = [
         junit         : '5.8.1',
         mockito       : '4.0.0',
         slf4j         : '1.7.32',
-        log4j2        : '2.14.1',
+        log4j2        : '2.16.0',
         lombok        : '1.18.22',
         hikari        : '5.0.0',
         mybatis       : '3.5.7',
@@ -22,7 +22,8 @@ def ver = [
         jackson       : '2.13.0',
         hibernateValid: '6.0.22.Final',
         hamcrest      : '2.2',
-        jsonPath      : '2.6.0'
+        jsonPath      : '2.6.0',
+        jasypt        : '1.9.3'
 ]
 
 group 'com.flab'
@@ -62,6 +63,7 @@ dependencies {
     implementation "com.fasterxml.jackson.core:jackson-databind:${ver.jackson}"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${ver.jackson}"
     implementation "com.h2database:h2:${ver.h2}"
+    implementation "org.jasypt:jasypt:${ver.jasypt}"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${ver.junit}"
     testImplementation "org.springframework:spring-test:${ver.spring}"
     testImplementation "org.mockito:mockito-junit-jupiter:${ver.mockito}"

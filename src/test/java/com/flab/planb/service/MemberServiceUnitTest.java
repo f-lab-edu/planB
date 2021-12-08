@@ -14,9 +14,11 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith({MockitoExtension.class})
+@PropertySource("file:src/main/resources/log4j2.xml")
 class MemberServiceUnitTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(MemberServiceUnitTest.class);
