@@ -4,6 +4,9 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.jasypt.encryption.pbe.PBEStringEncryptor;
+import org.jasypt.encryption.pbe.PooledPBEStringEncryptor;
+import org.jasypt.encryption.pbe.config.EnvironmentStringPBEConfig;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.annotation.MapperScan;
@@ -34,14 +37,24 @@ public class DBConfig {
     private String password;
     @Value("${spring.datasource.max-pool-size}")
     private int maxPoolSize;
+    @Value("${jasypt.encryptor.password}")
+    private String jasyptEncryptKey;
+    @Value("${jasypt.encryptor.algorithm}")
+    private String jasyptAlgorithm;
+    @Value("${jasypt.encryptor.iv-generator-class-name}")
+    private String jasyptIvGeneratorClassName;
+    @Value("${jasypt.encryptor.key-obtention-iterations}")
+    private int jasyptKeyObtentionIterations;
+    @Value("${jasypt.encryptor.pool-size}")
+    private int jasyptPoolSize;
 
     @Bean
-    public HikariConfig hikariConfig() {
+    public HikariConfig hikariConfig(PBEStringEncryptor pbeStringEncryptor) {
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setDriverClassName(driverClassName);
         hikariConfig.setJdbcUrl(url);
-        hikariConfig.setUsername(userName);
-        hikariConfig.setPassword(password);
+        hikariConfig.setUsername(pbeStringEncryptor.decrypt(userName));
+        hikariConfig.setPassword(pbeStringEncryptor.decrypt(password));
         hikariConfig.setMaximumPoolSize(maxPoolSize);
         hikariConfig.setConnectionTestQuery("SELECT 1");
         hikariConfig.setPoolName("planbHikariCP");
@@ -72,4 +85,16 @@ public class DBConfig {
         return sessionFactory.getObject();
     }
 
+    @Bean
+    public PBEStringEncryptor pooledPBEStringEncryptor() {
+        EnvironmentStringPBEConfig pbeConfig = new EnvironmentStringPBEConfig();
+        pbeConfig.setPasswordEnvName(jasyptEncryptKey);
+        pbeConfig.setAlgorithm(jasyptAlgorithm);
+        pbeConfig.setKeyObtentionIterations(jasyptKeyObtentionIterations);
+        pbeConfig.setIvGeneratorClassName(jasyptIvGeneratorClassName);
+        pbeConfig.setPoolSize(jasyptPoolSize);
+        PooledPBEStringEncryptor pooledPBEStringEncryptor = new PooledPBEStringEncryptor();
+        pooledPBEStringEncryptor.setConfig(pbeConfig);
+        return pooledPBEStringEncryptor;
+    }
 }

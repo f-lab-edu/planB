@@ -38,6 +38,3 @@ out/
 .classpath
 .project
 .settings/
-
-# properties #
-datasource.properties

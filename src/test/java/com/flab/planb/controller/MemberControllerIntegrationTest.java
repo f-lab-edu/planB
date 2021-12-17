@@ -13,6 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -39,6 +40,13 @@ import java.nio.charset.StandardCharsets;
         RootConfig.class,
         DBConfig.class,
         SecurityConfig.class
+    }
+)
+@PropertySource(
+    {
+        "file:src/main/resources/properties/*.properties",
+        "file:src/main/resources/messages/*.properties",
+        "file:src/main/resources/log4j2.xml"
     }
 )
 public class MemberControllerIntegrationTest {

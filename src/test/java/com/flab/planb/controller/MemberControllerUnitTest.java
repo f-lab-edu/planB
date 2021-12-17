@@ -15,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -28,6 +29,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 
+@PropertySource("file:src/main/resources/log4j2.xml")
 public class MemberControllerUnitTest {
 
     private static final MediaType JSON_UTF_8 = new MediaType(
@@ -56,7 +58,7 @@ public class MemberControllerUnitTest {
 
     @BeforeAll
     static void staticSetUp() {
-        messageSource.setBasename("classpath:messages/message");
+        messageSource.setBasename("file:src/main/resources/messages/message");
         messageSource.setDefaultEncoding(MessageLookup.ENCODIG);
         messageSource.setCacheSeconds(60);
         messageSource.setUseCodeAsDefaultMessage(true);
