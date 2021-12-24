@@ -1,5 +1,6 @@
 package com.flab.planb.service;
 
+import com.flab.planb.dto.member.LoginDTO;
 import com.flab.planb.dto.member.MemberDTO;
 import com.flab.planb.service.mapper.MemberMapper;
 import org.junit.jupiter.api.Assertions;
@@ -15,15 +16,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith({MockitoExtension.class})
 @PropertySource("file:src/main/resources/log4j2.xml")
 class MemberServiceUnitTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(MemberServiceUnitTest.class);
-    @Mock
-    private PasswordEncoder passwordEncoder;
     @Mock
     private MemberMapper memberMapper;
     @InjectMocks
@@ -71,6 +69,21 @@ class MemberServiceUnitTest {
         memberService.saveMemberInfo(memberDTO);
         // then
         Mockito.verify(memberMapper).saveMemberInfo(memberDTO);
+    }
+
+    @Test
+    @DisplayName("MemberId로 회원정보 조회")
+    void test_findByMemberId() throws Exception {
+        LoginDTO returnDTO = LoginDTO.builder()
+                                     .memberId("memberTest").passwd("test1234")
+                                     .build();
+        // given
+        Mockito.when(memberMapper.findByMemberId(ArgumentMatchers.anyString()))
+               .thenReturn(returnDTO);
+        // when
+        LoginDTO loginDTO = memberService.findByMemberId(ArgumentMatchers.anyString());
+        // then
+        Assertions.assertEquals(returnDTO, loginDTO);
     }
 
 }

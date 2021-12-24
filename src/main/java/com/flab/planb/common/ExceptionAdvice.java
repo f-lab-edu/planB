@@ -8,8 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
 
 @RequiredArgsConstructor
 @RestControllerAdvice
@@ -19,8 +19,10 @@ public class ExceptionAdvice {
     private final MessageLookup messageLookup;
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> methodValidException(MethodArgumentNotValidException exception,
-                                                  HttpServletRequest request) {
+    public ResponseEntity<?> methodValidException(
+        MethodArgumentNotValidException exception,
+        HttpServletRequest request
+    ) {
         log.error("유효성 검증 실패 URI : " + request.getRequestURI());
         exception.getBindingResult().getAllErrors()
                  .forEach(error -> log.error(error.getDefaultMessage()));
