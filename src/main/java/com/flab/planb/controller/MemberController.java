@@ -8,6 +8,7 @@ import com.flab.planb.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +27,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final MessageLookup messageLookup;
+    private final PasswordEncoder passwordEncoder;
     private final String validKey = MessageCode.VALID_OVERLAP.getMessageKey();
     private final String validCode = MessageCode.VALID_OVERLAP.getMessageCode();
 
@@ -58,6 +60,7 @@ public class MemberController {
             );
         }
 
+        memberDTO.setPasswd(passwordEncoder.encode(memberDTO.getPasswd()));
         memberService.saveMemberInfo(memberDTO);
 
         return setSucceed(MessageCode.INSERT_SUCCEED.getMessageKey());

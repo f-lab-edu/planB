@@ -9,6 +9,7 @@ def ver = [
         servletAPI    : '4.0.1',
         tomcat        : '9.0.53',
         commonIO      : '2.11.0',
+        commonLang    : '3.12.0',
         junit         : '5.8.1',
         mockito       : '4.0.0',
         slf4j         : '1.7.32',
@@ -49,6 +50,7 @@ dependencies {
     annotationProcessor "org.projectlombok:lombok:${ver.lombok}"
     implementation "org.hibernate:hibernate-validator:${ver.hibernateValid}"
     implementation "commons-io:commons-io:${ver.commonIO}"
+    implementation "org.apache.commons:commons-lang3:${ver.commonLang}"
     implementation "org.apache.logging.log4j:log4j-slf4j-impl:${ver.log4j2}"
     implementation "org.apache.tomcat.embed:tomcat-embed-core:${ver.tomcat}"
     implementation "org.apache.tomcat.embed:tomcat-embed-jasper:${ver.tomcat}"
@@ -66,6 +68,7 @@ dependencies {
     implementation "org.jasypt:jasypt:${ver.jasypt}"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${ver.junit}"
     testImplementation "org.springframework:spring-test:${ver.spring}"
+    testImplementation "org.springframework.security:spring-security-test:${ver.springSecurity}"
     testImplementation "org.mockito:mockito-junit-jupiter:${ver.mockito}"
     testImplementation "org.junit.jupiter:junit-jupiter-api:${ver.junit}"
     testImplementation "org.hamcrest:hamcrest-core:${ver.hamcrest}"

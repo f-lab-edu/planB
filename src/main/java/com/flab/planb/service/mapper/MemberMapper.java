@@ -1,5 +1,6 @@
 package com.flab.planb.service.mapper;
 
+import com.flab.planb.dto.member.LoginDTO;
 import com.flab.planb.dto.member.MemberDTO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -11,5 +12,7 @@ public interface MemberMapper {
     int countByMemberId(String memberId);
 
     int countByNickName(String nickName);
+
+    LoginDTO findByMemberId(String memberId);
 
 }
