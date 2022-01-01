@@ -3,6 +3,7 @@ package com.flab.planb.security;
 import com.flab.planb.common.MessageLookup;
 import com.flab.planb.common.ResponseWriter;
 import com.flab.planb.message.MessageCode;
+import com.flab.planb.message.ResponseMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
@@ -26,11 +27,13 @@ public class SecurityAuthenticationEntryPoint implements AuthenticationEntryPoin
         HttpServletResponse response,
         AuthenticationException authException
     ) throws IOException {
-        responseWriter.writer(
-            response,
-            HttpStatus.UNAUTHORIZED,
-            messageLookup.getMessage(MessageCode.AUTH_FAIL.getMessageKey()),
-            Map.of("errorCode", MessageCode.AUTH_FAIL.getMessageCode())
-        );
+        responseWriter.setHeader(response, HttpStatus.UNAUTHORIZED);
+        response.getWriter()
+                .write(responseWriter.messageToString(ResponseMessage.builder()
+                                                                     .statusMessage(messageLookup.getMessage(
+                                                                         MessageCode.AUTH_FAIL.getMessageKey()))
+                                                                     .data(Map.of("errorCode",
+                                                                                  MessageCode.AUTH_FAIL.getMessageCode()))
+                                                                     .build()));
     }
 }

@@ -34,6 +34,7 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 @WebAppConfiguration
 @Transactional
@@ -62,7 +63,7 @@ public class LoginLogoutIntegrationTest {
     );
     private final String resultErrorCodeKey = "$.data.errorCode";
     private final String illegalFailCode = "ILLEGAL_ARGUMENT_FAIL";
-    private final String deniedFailCode = "DENIED_FAIL";
+    private final String loginFailCode = "LOGIN_FAIL_001";
     @Autowired
     private WebApplicationContext webContext;
     @Autowired
@@ -151,7 +152,7 @@ public class LoginLogoutIntegrationTest {
         actions.andExpect(MockMvcResultMatchers.status().isBadRequest())
                .andExpect(MockMvcResultMatchers.content().contentType(JSON_UTF_8))
                .andExpect(MockMvcResultMatchers.jsonPath(resultErrorCodeKey)
-                                               .value(IsEqual.equalTo(deniedFailCode)));
+                                               .value(IsEqual.equalTo(loginFailCode)));
     }
 
     @Test
@@ -169,7 +170,7 @@ public class LoginLogoutIntegrationTest {
         actions.andExpect(MockMvcResultMatchers.status().isBadRequest())
                .andExpect(MockMvcResultMatchers.content().contentType(JSON_UTF_8))
                .andExpect(MockMvcResultMatchers.jsonPath(resultErrorCodeKey)
-                                               .value(IsEqual.equalTo(deniedFailCode)));
+                                               .value(IsEqual.equalTo(loginFailCode)));
     }
 
     @Test
@@ -187,7 +188,12 @@ public class LoginLogoutIntegrationTest {
         actions.andExpect(MockMvcResultMatchers.status().isOk())
                .andExpect(MockMvcResultMatchers.content().contentType(JSON_UTF_8))
                .andExpect(MockMvcResultMatchers.jsonPath(resultDataCodeKey)
-                                               .value(IsEqual.equalTo(memberDTO.getNickname())));
+                                               .value(IsEqual.equalTo(memberDTO.getNickname())))
+               .andExpect(MockMvcResultMatchers.request().sessionAttribute(
+                   "SPRING_SECURITY_CONTEXT",
+                   Objects.requireNonNull(actions.andReturn().getRequest().getSession())
+                          .getAttribute("SPRING_SECURITY_CONTEXT")));
+
     }
 
     @Test
@@ -195,13 +201,20 @@ public class LoginLogoutIntegrationTest {
     @DisplayName("로그아웃 성공")
     void when_logout_expected_okt() throws Exception {
         // given
+        mockMvc.perform(
+            MockMvcRequestBuilders.post(getUri("/members/login"))
+                                  .contentType(JSON_UTF_8)
+                                  .content(new ObjectMapper().writeValueAsString(loginDTO))
+        ).andDo(MockMvcResultHandlers.print());
         // when
-        final ResultActions actions = mockMvc.perform(
+        final ResultActions logoutActions = mockMvc.perform(
             MockMvcRequestBuilders.post("/members/logout")
                                   .contentType(JSON_UTF_8)
         ).andDo(MockMvcResultHandlers.print());
         // then
-        actions.andExpect(MockMvcResultMatchers.status().isOk());
+        logoutActions.andExpect(MockMvcResultMatchers.status().isOk())
+                     .andExpect(MockMvcResultMatchers.request().sessionAttributeDoesNotExist(
+                         "SPRING_SECURITY_CONTEXT"));
     }
 
 }

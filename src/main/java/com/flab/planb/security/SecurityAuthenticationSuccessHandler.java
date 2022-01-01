@@ -2,13 +2,13 @@ package com.flab.planb.security;
 
 import com.flab.planb.common.ResponseWriter;
 import com.flab.planb.dto.member.LoginDTO;
-import java.util.Map;
+import com.flab.planb.message.ResponseMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import java.io.IOException;
-import javax.servlet.ServletException;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -23,11 +23,12 @@ public class SecurityAuthenticationSuccessHandler implements AuthenticationSucce
         HttpServletResponse response,
         Authentication authentication
     ) throws IOException {
-        responseWriter.writer(
-            response,
-            HttpStatus.OK,
-            Map.of("nickname", ((LoginDTO) authentication.getPrincipal()).getNickname())
-        );
+        responseWriter.setHeader(response, HttpStatus.OK);
+        response.getWriter()
+                .write(responseWriter.messageToString(ResponseMessage.builder()
+                                                                     .data(Map.of("nickname",
+                                                                                  ((LoginDTO) authentication.getPrincipal()).getNickname()))
+                                                                     .build()));
     }
 
 }

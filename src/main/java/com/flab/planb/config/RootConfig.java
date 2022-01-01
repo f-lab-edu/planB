@@ -1,6 +1,7 @@
 package com.flab.planb.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.flab.planb.common.MessageLookup;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Configuration;
@@ -39,7 +40,7 @@ public class RootConfig {
 
     @Bean
     public ObjectMapper objectMapper() {
-        return new ObjectMapper();
+        return new ObjectMapper().registerModule(new JavaTimeModule());
     }
 
 }

@@ -6,8 +6,8 @@ import com.flab.planb.message.MessageSenderStrategyGroup;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.handler.AbstractHandlerExceptionResolver;
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,13 +15,13 @@ import javax.servlet.http.HttpServletResponse;
 @RequiredArgsConstructor
 @Component
 @Slf4j
-public class ExceptionResolver extends AbstractHandlerExceptionResolver {
+public class ExceptionResolver implements HandlerExceptionResolver {
 
     private final ResponseWriter responseWriter;
     private final MessageLookup messageLookup;
 
     @Override
-    protected ModelAndView doResolveException(
+    public ModelAndView resolveException(
         HttpServletRequest request,
         HttpServletResponse response,
         Object handler,
@@ -29,11 +29,10 @@ public class ExceptionResolver extends AbstractHandlerExceptionResolver {
     ) {
         try {
             MessageSenderStrategyGroup.findMessageStrategy(exception.getClass().getSimpleName())
-                                      .writer(response, responseWriter, messageLookup);
+                                      .sendMessage(response, responseWriter, messageLookup);
         } catch (IOException e) {
             log.error("{}", e.getMessage());
         }
         return null;
     }
-
 }

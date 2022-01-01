@@ -1,5 +1,6 @@
 package com.flab.planb.filter;
 
+import javax.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 @Slf4j
 public class FilterChainExceptionFilter extends OncePerRequestFilter {
 
+    @Resource(name = "exceptionResolver")
     private final HandlerExceptionResolver exceptionResolver;
 
     @Override

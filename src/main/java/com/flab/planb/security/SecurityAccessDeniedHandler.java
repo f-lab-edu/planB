@@ -3,6 +3,7 @@ package com.flab.planb.security;
 import com.flab.planb.common.MessageLookup;
 import com.flab.planb.common.ResponseWriter;
 import com.flab.planb.message.MessageCode;
+import com.flab.planb.message.ResponseMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -26,11 +27,13 @@ public class SecurityAccessDeniedHandler implements AccessDeniedHandler {
         HttpServletResponse response,
         AccessDeniedException accessDeniedException
     ) throws IOException {
-        responseWriter.writer(
-            response,
-            HttpStatus.FORBIDDEN,
-            messageLookup.getMessage(MessageCode.DENIED_FAIL.getMessageKey()),
-            Map.of("errorCode", MessageCode.DENIED_FAIL.getMessageCode())
-        );
+        responseWriter.setHeader(response, HttpStatus.FORBIDDEN);
+        response.getWriter()
+                .write(responseWriter.messageToString(ResponseMessage.builder()
+                                                                     .statusMessage(messageLookup.getMessage(
+                                                                         MessageCode.DENIED_FAIL.getMessageKey()))
+                                                                     .data(Map.of("errorCode",
+                                                                                  MessageCode.DENIED_FAIL.getMessageCode()))
+                                                                     .build()));
     }
 }

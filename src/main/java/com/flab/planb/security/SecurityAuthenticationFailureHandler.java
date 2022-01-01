@@ -3,13 +3,13 @@ package com.flab.planb.security;
 import com.flab.planb.common.MessageLookup;
 import com.flab.planb.common.ResponseWriter;
 import com.flab.planb.message.MessageCode;
+import com.flab.planb.message.ResponseMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import java.io.IOException;
 import java.util.Map;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -25,11 +25,13 @@ public class SecurityAuthenticationFailureHandler implements AuthenticationFailu
         HttpServletResponse response,
         AuthenticationException exception
     ) throws IOException {
-        responseWriter.writer(
-            response,
-            HttpStatus.FORBIDDEN,
-            messageLookup.getMessage(MessageCode.DENIED_FAIL.getMessageKey()),
-            Map.of("errorCode", MessageCode.DENIED_FAIL.getMessageCode())
-        );
+        responseWriter.setHeader(response, HttpStatus.BAD_REQUEST);
+        response.getWriter()
+                .write(responseWriter.messageToString(ResponseMessage.builder()
+                                                                     .statusMessage(messageLookup.getMessage(
+                                                                         MessageCode.LOGIN_FAIL.getMessageKey()))
+                                                                     .data(Map.of("errorCode",
+                                                                                  MessageCode.LOGIN_FAIL.getMessageCode()))
+                                                                     .build()));
     }
 }

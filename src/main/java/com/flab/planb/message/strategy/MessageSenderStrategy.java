@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 
 public interface MessageSenderStrategy {
 
-    void writer(
+    void sendMessage(
         HttpServletResponse response,
         ResponseWriter responseWriter,
         MessageLookup messageLookup

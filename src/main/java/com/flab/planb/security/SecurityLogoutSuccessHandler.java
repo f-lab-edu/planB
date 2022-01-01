@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import java.io.IOException;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -21,9 +20,6 @@ public class SecurityLogoutSuccessHandler implements LogoutSuccessHandler {
         HttpServletResponse response,
         Authentication authentication
     ) throws IOException {
-        responseWriter.writer(
-            response,
-            HttpStatus.OK
-        );
+        responseWriter.setHeader(response, HttpStatus.OK);
     }
 }

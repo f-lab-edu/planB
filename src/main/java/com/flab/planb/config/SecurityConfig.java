@@ -24,6 +24,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @RequiredArgsConstructor
@@ -53,7 +54,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .formLogin().disable()
             .logout(logout -> logout.logoutUrl("/members/logout")
                                     .invalidateHttpSession(true)
-                                    .deleteCookies("JSESSIONID")
+                                    .clearAuthentication(true)
+                                    .addLogoutHandler(new SecurityContextLogoutHandler())
                                     .logoutSuccessHandler(
                                         new SecurityLogoutSuccessHandler(responseWriter)
                                     ))
