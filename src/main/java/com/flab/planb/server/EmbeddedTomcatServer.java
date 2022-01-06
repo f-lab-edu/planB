@@ -1,6 +1,9 @@
 package com.flab.planb.server;
 
+import ch.qos.logback.core.joran.spi.JoranException;
+import ch.qos.logback.ext.spring.LogbackConfigurer;
 import com.flab.planb.common.MessageLookup;
+import java.io.FileNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.Context;
@@ -36,9 +39,11 @@ public class EmbeddedTomcatServer {
     private String rootPath;
 
     @PostConstruct
-    public void start() throws LifecycleException {
+    public void start() throws LifecycleException, JoranException, FileNotFoundException {
         // Tomcat 구성 요소 중 하나가 시작되지 않는 경우 Tomcat을 중지하기 위한 것
         System.setProperty("org.apache.catalina.startup.EXIT_ON_INIT_FAILURE", "true");
+        LogbackConfigurer.initLogging(
+            "classpath:logback-" + System.getProperty("spring.profiles.active", "dev") + ".xml");
         tomcat.setBaseDir(createTempDir());
         tomcat.setPort(port);
         tomcat.getHost().setAppBase(appBase);

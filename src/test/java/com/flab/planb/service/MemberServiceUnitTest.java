@@ -18,7 +18,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith({MockitoExtension.class})
-@PropertySource("file:src/main/resources/log4j2.xml")
+@PropertySource("file:src/main/resources/logback-dev.xml")
 class MemberServiceUnitTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(MemberServiceUnitTest.class);

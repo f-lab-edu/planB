@@ -1,10 +1,12 @@
 package com.flab.planb.controller;
 
+import ch.qos.logback.core.joran.spi.JoranException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flab.planb.common.MessageLookup;
 import com.flab.planb.common.ExceptionAdvice;
 import com.flab.planb.dto.member.MemberDTO;
 import com.flab.planb.service.MemberService;
+import java.io.FileNotFoundException;
 import org.hamcrest.core.IsEqual;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,7 +31,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 
-@PropertySource("file:src/main/resources/log4j2.xml")
+@PropertySource("file:src/main/resources/logback-dev.xml")
 public class MemberControllerUnitTest {
 
     private static final MediaType JSON_UTF_8 = new MediaType(
@@ -57,7 +59,7 @@ public class MemberControllerUnitTest {
     }
 
     @BeforeAll
-    static void staticSetUp() {
+    static void staticSetUp() throws JoranException, FileNotFoundException {
         messageSource.setBasename("file:src/main/resources/messages/message");
         messageSource.setDefaultEncoding(MessageLookup.ENCODIG);
         messageSource.setCacheSeconds(60);
