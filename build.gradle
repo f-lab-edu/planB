@@ -37,6 +37,8 @@ repositories {
     mavenCentral()
 }
 
+jar { manifest { attributes "Main-Class": "$mainClassName" } }
+
 dependencies {
     compileOnly "javax.servlet:javax.servlet-api:${ver.servletAPI}"
     compileOnly "org.projectlombok:lombok:${ver.lombok}"
