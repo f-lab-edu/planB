@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flab.planb.service.mapper.AddressMapper">
+  <!-- 사용자 배달주소 추가 -->
+  <insert id="saveAddress" parameterType="com.flab.planb.dto.member.AddressDTO">
+    insert into planb.tbl_member_address
+      (member_id, zip_code, alias, address)
+    values (#{memberId}, #{zipCode}, #{alias}, #{address})
+  </insert>
+  <select id="countByIdFromMembers" parameterType="long" resultType="int">
+    select count(*)
+    from planb.tbl_members
+    where id = #{memberId}
+  </select>
+</mapper>
