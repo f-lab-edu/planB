@@ -7,4 +7,4 @@ planB는 커피 배달 구독 서비스입니다.<br/>
 Spring, Spring security, Gradle, Mysql, Mybatis, JUnit 5, OpenJDK 17, Embedded Tomcat 9, AWS, Jenkins
 
 # ER diagram
-<img src="https://user-images.githubusercontent.com/15783027/147851585-affa6f71-da2e-4fdf-9495-49f20af52fd1.png" style="width: 50%;">
+<img src="https://user-images.githubusercontent.com/15783027/154079250-dce52735-7f78-407e-8631-1313bdc1884d.PNG" style="width: 50%;">
