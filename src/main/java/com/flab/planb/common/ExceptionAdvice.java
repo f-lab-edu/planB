@@ -28,8 +28,8 @@ public class ExceptionAdvice {
         return ResponseEntity.badRequest().body(
             ResponseMessage.builder()
                            .statusMessage(
-                               messageLookup.getMessage(MessageCode.VALID_FAIL.getMessageKey())
-                           ).data(Map.of("errorCode", MessageCode.VALID_FAIL.getMessageCode()))
+                               messageLookup.getMessage(MessageCode.VALID_FAIL.getKey())
+                           ).data(Map.of("errorCode", MessageCode.VALID_FAIL.getValue()))
                            .build()
         );
     }
