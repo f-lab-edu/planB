@@ -26,14 +26,14 @@ public class MemberController {
 
     private final MemberService memberService;
     private final MessageLookup messageLookup;
-    private final String validKey = MessageCode.VALID_OVERLAP.getMessageKey();
-    private final String validCode = MessageCode.VALID_OVERLAP.getMessageCode();
+    private final String validKey = MessageCode.VALID_OVERLAP.getKey();
+    private final String validCode = MessageCode.VALID_OVERLAP.getValue();
 
     @GetMapping(value = "/member-id")
     public ResponseEntity<?> isExistMemberId(
         @RequestParam("check") @NotBlank String memberId) {
         return isCountByMemberIdZero(memberId) ? setSucceed(
-            MessageCode.VALID_SUCCEED.getMessageKey())
+            MessageCode.VALID_SUCCEED.getKey())
                                                : setFail(validKey, "text.id", validCode);
     }
 
@@ -41,7 +41,7 @@ public class MemberController {
     public ResponseEntity<?> isExistNickname(
         @RequestParam("check") @NotBlank String nickname) {
         return isCountByNickNameZero(nickname) ? setSucceed(
-            MessageCode.VALID_SUCCEED.getMessageKey())
+            MessageCode.VALID_SUCCEED.getKey())
                                                : setFail(validKey, "text.nickname", validCode);
     }
 
@@ -52,15 +52,15 @@ public class MemberController {
         if (!isCountByMemberIdZero(memberDTO.getMemberId())
             || !isCountByNickNameZero(memberDTO.getNickname())) {
             return setFail(
-                MessageCode.INSERT_FAIL_DATA.getMessageKey(),
+                MessageCode.INSERT_FAIL_DATA.getKey(),
                 null,
-                MessageCode.INSERT_FAIL_DATA.getMessageCode()
+                MessageCode.INSERT_FAIL_DATA.getValue()
             );
         }
 
         memberService.saveMemberInfo(memberDTO);
 
-        return setSucceed(MessageCode.INSERT_SUCCEED.getMessageKey());
+        return setSucceed(MessageCode.INSERT_SUCCEED.getKey());
     }
 
     private boolean isCountByMemberIdZero(String sqlParameter) {

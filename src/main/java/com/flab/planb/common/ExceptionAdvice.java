@@ -21,15 +21,30 @@ public class ExceptionAdvice {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> methodValidException(MethodArgumentNotValidException exception,
                                                   HttpServletRequest request) {
-        log.error("유효성 검증 실패 URI : " + request.getRequestURI());
         exception.getBindingResult().getAllErrors()
-                 .forEach(error -> log.error(error.getDefaultMessage()));
+                 .forEach(error -> log.error(
+                     "MethodArgumentNotValidException URI : {} | message : {}",
+                     request.getRequestURI(), error.getDefaultMessage()));
 
         return ResponseEntity.badRequest().body(
             ResponseMessage.builder()
                            .statusMessage(
-                               messageLookup.getMessage(MessageCode.VALID_FAIL.getMessageKey())
-                           ).data(Map.of("errorCode", MessageCode.VALID_FAIL.getMessageCode()))
+                               messageLookup.getMessage(MessageCode.VALID_FAIL.getKey())
+                           ).data(Map.of("errorCode", MessageCode.VALID_FAIL.getValue()))
+                           .build()
+        );
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<?> methodValidException(IllegalArgumentException exception,
+                                                  HttpServletRequest request) {
+        log.error("IllegalArgumentException URI : {} | message : {}", request.getRequestURI(), exception.getMessage());
+
+        return ResponseEntity.badRequest().body(
+            ResponseMessage.builder()
+                           .statusMessage(
+                               messageLookup.getMessage(MessageCode.VALID_FAIL.getKey())
+                           ).data(Map.of("errorCode", MessageCode.VALID_FAIL.getValue()))
                            .build()
         );
     }
