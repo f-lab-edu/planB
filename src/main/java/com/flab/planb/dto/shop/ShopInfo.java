@@ -15,8 +15,6 @@ import javax.validation.constraints.Positive;
 public class ShopInfo {
 
     private long id;
-    @Positive(message = "사업자정보 ID는 양수여야 합니다.")
-    private long businessId;
     @NotBlank(message = "배달지역은 Null과 공백이 아닌 값이 들어가야 합니다.")
     private String deliveryArea;
     @Pattern(regexp = "[0-9]{2}", message = "최소조리시간은 2자리 숫자여야 합니다.")
@@ -27,10 +25,9 @@ public class ShopInfo {
     private int tip;
     private String introduction;
 
-    public ShopInfo(long id, long businessId, String deliveryArea, String minCookingTime,
+    public ShopInfo(long id, String deliveryArea, String minCookingTime,
                     String maxCookingTime, int tip, String introduction) {
         this.id = id;
-        this.businessId = businessId;
         this.deliveryArea = deliveryArea;
         this.minCookingTime = minCookingTime;
         this.maxCookingTime = maxCookingTime;
