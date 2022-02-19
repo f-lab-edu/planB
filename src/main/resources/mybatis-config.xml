@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?> <!DOCTYPE configuration PUBLIC
+  "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+  <settings>
+    <setting name="mapUnderscoreToCamelCase" value="true"/>
+    <setting name="callSettersOnNulls" value="true"/>
+  </settings>
+  <typeAliases>
+    <typeAlias type="com.flab.planb.dto.member.MemberDTO" alias="memberDTO"/>
+    <typeAlias type="com.flab.planb.dto.shop.ShopInfo" alias="shopInfo"/>
+    <typeAlias type="com.flab.planb.dto.shop.ShopDayoff" alias="shopDayoff"/>
+    <typeAlias type="com.flab.planb.dto.subscription.request.SubscriptionRequest" alias="subscriptionRequest"/>
+    <typeAlias type="com.flab.planb.dto.subscription.Subscription" alias="subscription"/>
+    <typeAlias type="com.flab.planb.dto.subscription.SubscriptionMenu" alias="subscriptionMenu"/>
+  </typeAliases>
+</configuration>

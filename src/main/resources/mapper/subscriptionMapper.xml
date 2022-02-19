@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flab.planb.service.mapper.SubscriptionMapper">
+  <select id="existsDuplicateSubscription" parameterType="subscriptionRequest" resultType="int">
+    select exists(
+             select id
+             from planb.tbl_subscription
+             where member_id = #{memberId}
+               and shop_id = #{shopId}
+               and subscription_day = #{subscriptionDay}
+               and subscription_time = #{subscriptionTime}
+             )
+  </select>
+  <insert id="saveSubscription" parameterType="subscription" useGeneratedKeys="true" keyProperty="id">
+    insert into planb.tbl_subscription
+      (member_id, shop_id, address_id, subscription_day, subscription_time)
+    values (#{memberId}, #{shopId}, #{addressId}, #{subscriptionDay}, #{subscriptionTime})
+  </insert>
+  <insert id="saveSubscriptionMenus" parameterType="list">
+    insert into planb.tbl_subscription_menu
+    (subscription_id, menu_id)
+    values
+    <foreach collection="list" item="item" separator=",">
+      (#{item.subscriptionId}, #{item.menuId})
+    </foreach>
+  </insert>
+  <insert id="saveSubscriptionMenuOptions" parameterType="subscriptionMenu">
+    insert into planb.tbl_subscription_menu_option
+    (subscription_id, subscription_menu_id, menu_option_id)
+    values
+    <foreach collection="menuOptions" item="item" separator=",">
+      (#{subscriptionId}, #{menuId}, #{item})
+    </foreach>
+  </insert>
+</mapper>

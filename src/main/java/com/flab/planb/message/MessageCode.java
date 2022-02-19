@@ -7,19 +7,19 @@ public enum MessageCode {
     INSERT_FAIL_DATA("error.insert.001", "INSERT_FAIL_001"),
     INSERT_SUCCEED("succeed.insert.001", "INSERT_SUCCEED");
 
-    private final String messageKey;
-    private final String messageCode;
+    private final String key;
+    private final String value;
 
-    MessageCode(String messageKey, String messageCode) {
-        this.messageKey = messageKey;
-        this.messageCode = messageCode;
+    MessageCode(String key, String value) {
+        this.key = key;
+        this.value = value;
     }
 
-    public String getMessageKey() {
-        return this.messageKey;
+    public String getKey() {
+        return this.key;
     }
 
-    public String getMessageCode() {
-        return this.messageCode;
+    public String getValue() {
+        return this.value;
     }
 }
