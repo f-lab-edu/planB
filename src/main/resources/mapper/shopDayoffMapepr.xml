@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flab.planb.service.mapper.ShopDayoffMapepr">
+  <select id="findByShopId" parameterType="long" resultType="shopDayoff">
+    select shop_id, `day`
+    from planb.tbl_shop_dayoff
+    where shop_id = #{shopId}
+  </select>
+</mapper>
