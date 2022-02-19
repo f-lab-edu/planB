@@ -1,6 +1,6 @@
 package com.flab.planb.common;
 
-import com.flab.planb.message.MessageCode;
+import com.flab.planb.message.MessageSet;
 import com.flab.planb.message.ResponseMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,8 +28,8 @@ public class ExceptionAdvice {
         return ResponseEntity.badRequest().body(
             ResponseMessage.builder()
                            .statusMessage(
-                               messageLookup.getMessage(MessageCode.VALID_FAIL.getKey())
-                           ).data(Map.of("errorCode", MessageCode.VALID_FAIL.getValue()))
+                               messageLookup.getMessage(MessageSet.VALID_FAIL.getLookupKey())
+                           ).data(Map.of("errorCode", MessageSet.VALID_FAIL.getCode()))
                            .build()
         );
     }

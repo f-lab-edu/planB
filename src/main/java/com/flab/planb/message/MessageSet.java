@@ -1,25 +1,25 @@
 package com.flab.planb.message;
 
-public enum MessageCode {
+public enum MessageSet {
     VALID_FAIL("error.valid.001", "VALID_FAIL_001"),
     VALID_OVERLAP("error.valid.002", "VALID_FAIL_002"),
     VALID_SUCCEED("succeed.valid.001", "VALID_SUCCEED"),
     INSERT_FAIL_DATA("error.insert.001", "INSERT_FAIL_001"),
     INSERT_SUCCEED("succeed.insert.001", "INSERT_SUCCEED");
 
-    private final String key;
-    private final String value;
+    private final String lookupKey;
+    private final String code;
 
-    MessageCode(String key, String value) {
-        this.key = key;
-        this.value = value;
+    MessageSet(String lookupKey, String code) {
+        this.lookupKey = lookupKey;
+        this.code = code;
     }
 
-    public String getKey() {
-        return this.key;
+    public String getLookupKey() {
+        return this.lookupKey;
     }
 
-    public String getValue() {
-        return this.value;
+    public String getCode() {
+        return this.code;
     }
 }
