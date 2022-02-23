@@ -5,7 +5,12 @@ public enum MessageCode {
     VALID_OVERLAP("error.valid.002", "VALID_FAIL_002"),
     VALID_SUCCEED("succeed.valid.001", "VALID_SUCCEED"),
     INSERT_FAIL_DATA("error.insert.001", "INSERT_FAIL_001"),
-    INSERT_SUCCEED("succeed.insert.001", "INSERT_SUCCEED");
+    INSERT_SUCCEED("succeed.insert.001", "INSERT_SUCCEED"),
+    LOGIN_FAIL("error.login.001", "LOGIN_FAIL_001"),
+    DENIED_FAIL("error.access-denied", "DENIED_FAIL"),
+    AUTH_FAIL("error.authentication", "AUTH_FAIL"),
+    ILLEGAL_ARGUMENT_FAIL("error.illegalargument", "ILLEGAL_ARGUMENT_FAIL"),
+    BAD_REQUEST_FAIL("error.bac-request", "BAD_REQUEST_FAIL");
 
     private final String messageKey;
     private final String messageCode;

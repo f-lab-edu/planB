@@ -89,7 +89,7 @@ public class MemberControllerIntegrationTest {
 
     @Test
     @DisplayName("사용 중인 MemberId 확인 - 사용 중으로 실패")
-    void test_existence_memberId() throws Exception {
+    void when_memberId_is_existed_expected_bad_request() throws Exception {
         // given
         memberDTO.setMemberId("memberTest");
         // when
@@ -107,7 +107,7 @@ public class MemberControllerIntegrationTest {
 
     @Test
     @DisplayName("사용 중인 MemberId 확인 - 미사용으로 성공")
-    void test_checkNickName_noneFalse() throws Exception {
+    void when_memberId_is_not_existed_expected_ok() throws Exception {
         // given
         memberDTO.setMemberId("memberTest2");
         // when
@@ -125,7 +125,7 @@ public class MemberControllerIntegrationTest {
 
     @Test
     @DisplayName("사용 중인 Nickname 확인 - 사용 중으로 실패")
-    void test_existence_nickname() throws Exception {
+    void when_nickname_is_existed_expected_bad_request() throws Exception {
         // given
         memberDTO.setNickname("멤버테스트");
         // when
@@ -143,7 +143,7 @@ public class MemberControllerIntegrationTest {
 
     @Test
     @DisplayName("사용 중인 Nickname 확인 - 미사용으로 성공")
-    void test_not_existence_nickname() throws Exception {
+    void when_nickname_is_not_existed_expected_ok() throws Exception {
         // given
         memberDTO.setNickname("멤버테스트2");
         // when
@@ -161,7 +161,7 @@ public class MemberControllerIntegrationTest {
 
     @Test
     @DisplayName("memberId NotBlank 실패")
-    void test_memberID_notBlank() throws Exception {
+    void when_memberid_is_blank_expected_bad_request() throws Exception {
         // given
         memberDTO.setMemberId("");
         // when
@@ -179,7 +179,7 @@ public class MemberControllerIntegrationTest {
 
     @Test
     @DisplayName("passwd NotBlank 실패")
-    void test_passwd_notBlank() throws Exception {
+    void when_passwwd_is_blank_expected_bad_request() throws Exception {
         // given
         memberDTO.setPasswd("");
         // when
@@ -197,7 +197,7 @@ public class MemberControllerIntegrationTest {
 
     @Test
     @DisplayName("nickname NotBlank 실패")
-    void test_nickname_notBlank() throws Exception {
+    void when_nickname_is_blank_expected_bad_request() throws Exception {
         // given
         memberDTO.setNickname("");
         // when
@@ -215,7 +215,7 @@ public class MemberControllerIntegrationTest {
 
     @Test
     @DisplayName("tel NotBlank 실패")
-    void test_tel_notBlank() throws Exception {
+    void when_tel_is_blank_expected_bad_request() throws Exception {
         // given
         memberDTO.setTel("");
         // when
@@ -233,7 +233,7 @@ public class MemberControllerIntegrationTest {
 
     @Test
     @DisplayName("회원가입 실패")
-    void test_signup_failed() throws Exception {
+    void when_duplicated_signup_expected_bad_request() throws Exception {
         // given
         memberDTO = MemberDTO.builder()
                              .memberId("memberTest").nickname("멤버테스트")
@@ -254,7 +254,7 @@ public class MemberControllerIntegrationTest {
 
     @Test
     @DisplayName("회원가입 성공")
-    void test_signup_succeed() throws Exception {
+    void when_new_signup_expected_ok() throws Exception {
         // given
         memberDTO = MemberDTO.builder()
                              .memberId("memberTest2").nickname("멤버테스트2")
