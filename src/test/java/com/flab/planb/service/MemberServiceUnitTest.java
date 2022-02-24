@@ -1,6 +1,6 @@
 package com.flab.planb.service;
 
-import com.flab.planb.dto.member.MemberDTO;
+import com.flab.planb.dto.member.Member;
 import com.flab.planb.service.mapper.MemberMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -63,14 +63,14 @@ class MemberServiceUnitTest {
     void test_saveMemberInfo() throws Exception {
         int checkCouunt = 1;
         // given
-        MemberDTO memberDTO = MemberDTO.builder()
-                                       .memberId("memberTest").nickname("멤버테스트")
-                                       .passwd("test1234").tel("01012345678")
-                                       .build();
+        Member member = Member.builder()
+                              .memberId("memberTest").nickname("멤버테스트")
+                              .passwd("test1234").tel("01012345678")
+                              .build();
         // when
-        memberService.saveMemberInfo(memberDTO);
+        memberService.saveMemberInfo(member);
         // then
-        Mockito.verify(memberMapper).saveMemberInfo(memberDTO);
+        Mockito.verify(memberMapper).saveMemberInfo(member);
     }
 
 }

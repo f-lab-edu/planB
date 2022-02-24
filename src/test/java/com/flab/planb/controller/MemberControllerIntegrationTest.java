@@ -5,7 +5,7 @@ import com.flab.planb.config.DBConfig;
 import com.flab.planb.config.RootConfig;
 import com.flab.planb.config.SecurityConfig;
 import com.flab.planb.config.ServletConfig;
-import com.flab.planb.dto.member.MemberDTO;
+import com.flab.planb.dto.member.Member;
 import com.flab.planb.service.MemberService;
 import org.hamcrest.core.IsEqual;
 import org.junit.jupiter.api.BeforeEach;
@@ -65,7 +65,7 @@ public class MemberControllerIntegrationTest {
     @Autowired
     private MemberService memberService;
     private MockMvc mockMvc;
-    private MemberDTO memberDTO;
+    private Member member;
 
     private URI getUri(String uri) {
         return UriComponentsBuilder.fromUriString(uri).build().encode().toUri();
@@ -80,22 +80,25 @@ public class MemberControllerIntegrationTest {
                                          true)
                                  )
                                  .build();
-        memberDTO = MemberDTO.builder()
-                             .memberId("memberTest").nickname("멤버테스트")
-                             .passwd("test1234").tel("01012345678")
-                             .build();
-        memberService.saveMemberInfo(memberDTO);
+        member = Member.builder()
+                       .memberId("memberTest").nickname("멤버테스트")
+                       .passwd("test1234").tel("01012345678")
+                       .build();
+        memberService.saveMemberInfo(member);
     }
 
     @Test
     @DisplayName("사용 중인 MemberId 확인 - 사용 중으로 실패")
     void test_existence_memberId() throws Exception {
         // given
-        memberDTO.setMemberId("memberTest");
+        member = Member.builder()
+                       .memberId("memberTest").nickname("멤버테스트")
+                       .passwd("test1234").tel("01012345678")
+                       .build();
         // when
         final ResultActions actions = mockMvc.perform(
             MockMvcRequestBuilders.get(
-                getUri("/members/member-id?check=" + memberDTO.getMemberId())
+                getUri("/members/member-id?check=" + member.getMemberId())
             ).contentType(JSON_UTF_8)
         ).andDo(MockMvcResultHandlers.print());
         // then
@@ -109,11 +112,14 @@ public class MemberControllerIntegrationTest {
     @DisplayName("사용 중인 MemberId 확인 - 미사용으로 성공")
     void test_checkNickName_noneFalse() throws Exception {
         // given
-        memberDTO.setMemberId("memberTest2");
+        member = Member.builder()
+                       .memberId("memberTest2").nickname("멤버테스트")
+                       .passwd("test1234").tel("01012345678")
+                       .build();
         // when
         final ResultActions actions = mockMvc.perform(
             MockMvcRequestBuilders.get(
-                getUri("/members/member-id?check=" + memberDTO.getMemberId())
+                getUri("/members/member-id?check=" + member.getMemberId())
             ).contentType(JSON_UTF_8)
         ).andDo(MockMvcResultHandlers.print());
         // then
@@ -127,11 +133,14 @@ public class MemberControllerIntegrationTest {
     @DisplayName("사용 중인 Nickname 확인 - 사용 중으로 실패")
     void test_existence_nickname() throws Exception {
         // given
-        memberDTO.setNickname("멤버테스트");
+        member = Member.builder()
+                       .memberId("memberTest2").nickname("멤버테스트")
+                       .passwd("test1234").tel("01012345678")
+                       .build();
         // when
         final ResultActions actions = mockMvc.perform(
             MockMvcRequestBuilders.get(
-                getUri("/members/nickname?check=" + memberDTO.getNickname())
+                getUri("/members/nickname?check=" + member.getNickname())
             ).contentType(JSON_UTF_8)
         ).andDo(MockMvcResultHandlers.print());
         // then
@@ -145,11 +154,14 @@ public class MemberControllerIntegrationTest {
     @DisplayName("사용 중인 Nickname 확인 - 미사용으로 성공")
     void test_not_existence_nickname() throws Exception {
         // given
-        memberDTO.setNickname("멤버테스트2");
+        member = Member.builder()
+                       .memberId("memberTest2").nickname("멤버테스트2")
+                       .passwd("test1234").tel("01012345678")
+                       .build();
         // when
         final ResultActions actions = mockMvc.perform(
             MockMvcRequestBuilders.get(
-                getUri("/members/nickname?check=" + memberDTO.getNickname())
+                getUri("/members/nickname?check=" + member.getNickname())
             ).contentType(JSON_UTF_8)
         ).andDo(MockMvcResultHandlers.print());
         // then
@@ -163,12 +175,15 @@ public class MemberControllerIntegrationTest {
     @DisplayName("memberId NotBlank 실패")
     void test_memberID_notBlank() throws Exception {
         // given
-        memberDTO.setMemberId("");
+        member = Member.builder()
+                       .memberId("").nickname("멤버테스트2")
+                       .passwd("test1234").tel("01012345678")
+                       .build();
         // when
         final ResultActions actions = mockMvc.perform(
             MockMvcRequestBuilders.post(getUri("/members"))
                                   .contentType(JSON_UTF_8)
-                                  .content(new ObjectMapper().writeValueAsString(memberDTO))
+                                  .content(new ObjectMapper().writeValueAsString(member))
         ).andDo(MockMvcResultHandlers.print());
         // then
         actions.andExpect(MockMvcResultMatchers.status().isBadRequest())
@@ -181,12 +196,15 @@ public class MemberControllerIntegrationTest {
     @DisplayName("passwd NotBlank 실패")
     void test_passwd_notBlank() throws Exception {
         // given
-        memberDTO.setPasswd("");
+        member = Member.builder()
+                       .memberId("memberTest2").nickname("멤버테스트2")
+                       .passwd("").tel("01012345678")
+                       .build();
         // when
         final ResultActions actions = mockMvc.perform(
             MockMvcRequestBuilders.post(getUri("/members"))
                                   .contentType(JSON_UTF_8)
-                                  .content(new ObjectMapper().writeValueAsString(memberDTO))
+                                  .content(new ObjectMapper().writeValueAsString(member))
         ).andDo(MockMvcResultHandlers.print());
         // then
         actions.andExpect(MockMvcResultMatchers.status().isBadRequest())
@@ -199,12 +217,15 @@ public class MemberControllerIntegrationTest {
     @DisplayName("nickname NotBlank 실패")
     void test_nickname_notBlank() throws Exception {
         // given
-        memberDTO.setNickname("");
+        member = Member.builder()
+                       .memberId("memberTest2").nickname("")
+                       .passwd("test1234").tel("01012345678")
+                       .build();
         // when
         final ResultActions actions = mockMvc.perform(
             MockMvcRequestBuilders.post(getUri("/members"))
                                   .contentType(JSON_UTF_8)
-                                  .content(new ObjectMapper().writeValueAsString(memberDTO))
+                                  .content(new ObjectMapper().writeValueAsString(member))
         ).andDo(MockMvcResultHandlers.print());
         // then
         actions.andExpect(MockMvcResultMatchers.status().isBadRequest())
@@ -217,12 +238,15 @@ public class MemberControllerIntegrationTest {
     @DisplayName("tel NotBlank 실패")
     void test_tel_notBlank() throws Exception {
         // given
-        memberDTO.setTel("");
+        member = Member.builder()
+                       .memberId("memberTest2").nickname("멤버테스트2")
+                       .passwd("test1234").tel("")
+                       .build();
         // when
         final ResultActions actions = mockMvc.perform(
             MockMvcRequestBuilders.post(getUri("/members"))
                                   .contentType(JSON_UTF_8)
-                                  .content(new ObjectMapper().writeValueAsString(memberDTO))
+                                  .content(new ObjectMapper().writeValueAsString(member))
         ).andDo(MockMvcResultHandlers.print());
         // then
         actions.andExpect(MockMvcResultMatchers.status().isBadRequest())
@@ -235,15 +259,15 @@ public class MemberControllerIntegrationTest {
     @DisplayName("회원가입 실패")
     void test_signup_failed() throws Exception {
         // given
-        memberDTO = MemberDTO.builder()
-                             .memberId("memberTest").nickname("멤버테스트")
-                             .passwd("test1234").tel("01012345678")
-                             .build();
+        member = Member.builder()
+                       .memberId("memberTest").nickname("멤버테스트")
+                       .passwd("test1234").tel("01012345678")
+                       .build();
         // when
         final ResultActions actions = mockMvc.perform(
             MockMvcRequestBuilders.post(getUri("/members"))
                                   .contentType(JSON_UTF_8)
-                                  .content(new ObjectMapper().writeValueAsString(memberDTO))
+                                  .content(new ObjectMapper().writeValueAsString(member))
         ).andDo(MockMvcResultHandlers.print());
         // then
         actions.andExpect(MockMvcResultMatchers.status().isBadRequest())
@@ -256,15 +280,15 @@ public class MemberControllerIntegrationTest {
     @DisplayName("회원가입 성공")
     void test_signup_succeed() throws Exception {
         // given
-        memberDTO = MemberDTO.builder()
-                             .memberId("memberTest2").nickname("멤버테스트2")
-                             .passwd("test1234").tel("01012345678")
-                             .build();
+        member = Member.builder()
+                       .memberId("memberTest2").nickname("멤버테스트2")
+                       .passwd("test1234").tel("01012345678")
+                       .build();
         // when
         final ResultActions actions = mockMvc.perform(
             MockMvcRequestBuilders.post(getUri("/members"))
                                   .contentType(JSON_UTF_8)
-                                  .content(new ObjectMapper().writeValueAsString(memberDTO))
+                                  .content(new ObjectMapper().writeValueAsString(member))
         ).andDo(MockMvcResultHandlers.print());
         // then
         actions.andExpect(MockMvcResultMatchers.status().isOk())

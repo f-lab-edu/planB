@@ -1,12 +1,12 @@
 package com.flab.planb.service.mapper;
 
-import com.flab.planb.dto.member.MemberDTO;
+import com.flab.planb.dto.member.Member;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
 public interface MemberMapper {
 
-    void saveMemberInfo(MemberDTO memberDTO);
+    void saveMemberInfo(Member member);
 
     int countByMemberId(String memberId);
 
