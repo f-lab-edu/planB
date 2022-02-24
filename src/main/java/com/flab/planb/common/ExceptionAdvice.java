@@ -25,7 +25,7 @@ public class ExceptionAdvice {
                      "MethodArgumentNotValidException URI : {} | message : {}",
                      request.getRequestURI(), error.getDefaultMessage()));
 
-        return responseEntityBuilder.getResponseEntity(HttpStatus.BAD_REQUEST, MessageSet.VALID_FAIL);
+        return responseEntityBuilder.get(HttpStatus.BAD_REQUEST, MessageSet.VALID_FAIL);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
@@ -33,7 +33,7 @@ public class ExceptionAdvice {
                                                   HttpServletRequest request) {
         log.error("IllegalArgumentException URI : {} | message : {}", request.getRequestURI(), exception.getMessage());
 
-        return responseEntityBuilder.getResponseEntity(HttpStatus.BAD_REQUEST, MessageSet.VALID_FAIL);
+        return responseEntityBuilder.get(HttpStatus.BAD_REQUEST, MessageSet.VALID_FAIL);
     }
 
 }

@@ -29,17 +29,17 @@ public class MemberController {
     @GetMapping(value = "/member-id")
     public ResponseEntity<?> isExistMemberId(@RequestParam("check") @NotBlank String memberId) {
         return isCountByMemberIdZero(memberId)
-               ? responseEntityBuilder.getResponseEntity(HttpStatus.OK, MessageSet.VALID_SUCCEED)
-               : responseEntityBuilder.getResponseEntity(HttpStatus.BAD_REQUEST, MessageSet.VALID_OVERLAP,
-                                                         new String[]{"text.id"});
+               ? responseEntityBuilder.get(HttpStatus.OK, MessageSet.VALID_SUCCEED)
+               : responseEntityBuilder.get(HttpStatus.BAD_REQUEST, MessageSet.VALID_OVERLAP,
+                                           new String[]{"text.id"});
     }
 
     @GetMapping(value = "/nickname")
     public ResponseEntity<?> isExistNickname(@RequestParam("check") @NotBlank String nickname) {
         return isCountByNickNameZero(nickname)
-               ? responseEntityBuilder.getResponseEntity(HttpStatus.OK, MessageSet.VALID_SUCCEED)
-               : responseEntityBuilder.getResponseEntity(HttpStatus.BAD_REQUEST, MessageSet.VALID_OVERLAP,
-                                                         new String[]{"text.nickname"});
+               ? responseEntityBuilder.get(HttpStatus.OK, MessageSet.VALID_SUCCEED)
+               : responseEntityBuilder.get(HttpStatus.BAD_REQUEST, MessageSet.VALID_OVERLAP,
+                                           new String[]{"text.nickname"});
     }
 
     @PostMapping("")
@@ -47,12 +47,12 @@ public class MemberController {
         log.debug(member.toString());
 
         if (!isCountByMemberIdZero(member.getMemberId()) || !isCountByNickNameZero(member.getNickname())) {
-            return responseEntityBuilder.getResponseEntity(HttpStatus.BAD_REQUEST, MessageSet.INSERT_FAIL_DATA);
+            return responseEntityBuilder.get(HttpStatus.BAD_REQUEST, MessageSet.INSERT_FAIL_DATA);
         }
 
         memberService.saveMemberInfo(member);
 
-        return responseEntityBuilder.getResponseEntity(HttpStatus.OK, MessageSet.INSERT_SUCCEED);
+        return responseEntityBuilder.get(HttpStatus.OK, MessageSet.INSERT_SUCCEED);
     }
 
     private boolean isCountByMemberIdZero(String sqlParameter) {
