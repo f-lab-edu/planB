@@ -32,12 +32,12 @@ public class SubscriptionController {
         log.debug(request.toString());
 
         if (canNotSubscribe(request)) {
-            return responseEntityBuilder.getResponseEntity(HttpStatus.BAD_REQUEST, MessageSet.VALID_FAIL);
+            return responseEntityBuilder.get(HttpStatus.BAD_REQUEST, MessageSet.VALID_FAIL);
         }
 
         saveSubscriptionInfo(request);
 
-        return responseEntityBuilder.getResponseEntity(HttpStatus.OK, MessageSet.INSERT_SUCCEED);
+        return responseEntityBuilder.get(HttpStatus.OK, MessageSet.INSERT_SUCCEED);
     }
 
     @Transactional
@@ -62,14 +62,15 @@ public class SubscriptionController {
     private List<SubscriptionMenu> getSubscriptionMenus(SubscriptionRequest request) {
         return request.getSubscriptionMenus()
                       .entrySet().stream()
-                      .map(e -> new SubscriptionMenu(request.getId(),
-                                                     e.getKey(),
-                                                     e.getValue()))
+                      .map(e -> new SubscriptionMenu(
+                          request.getId(),
+                          e.getKey(),
+                          e.getValue()))
                       .toList();
     }
 
     private boolean canNotSubscribe(SubscriptionRequest subscriptionRequest) {
-        return shopInfoCheck.isNotavailable(subscriptionRequest) || isDuplicateSubscription(subscriptionRequest);
+        return shopInfoCheck.isNotAvailable(subscriptionRequest) || isDuplicateSubscription(subscriptionRequest);
     }
 
     private boolean isDuplicateSubscription(SubscriptionRequest subscriptionRequest) {
