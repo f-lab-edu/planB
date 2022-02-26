@@ -1,5 +1,6 @@
 package com.flab.planb.service;
 
+import com.flab.planb.dto.subscription.PushInfo;
 import com.flab.planb.dto.subscription.Subscription;
 import com.flab.planb.dto.subscription.SubscriptionMenu;
 import com.flab.planb.dto.subscription.request.SubscriptionRequest;
@@ -33,4 +34,7 @@ public class SubscriptionService {
                          .forEach(subscriptionMapper::saveSubscriptionMenuOptions);
     }
 
+    public List<PushInfo> findPushList() {
+        return subscriptionMapper.findPushList();
+    }
 }

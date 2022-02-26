@@ -2,6 +2,7 @@ package com.flab.planb.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flab.planb.config.DBConfig;
+import com.flab.planb.config.PushBatchConfig;
 import com.flab.planb.config.RootConfig;
 import com.flab.planb.config.SecurityConfig;
 import com.flab.planb.config.ServletConfig;
@@ -39,7 +40,8 @@ import java.nio.charset.StandardCharsets;
         ServletConfig.class,
         RootConfig.class,
         DBConfig.class,
-        SecurityConfig.class
+        SecurityConfig.class,
+        PushBatchConfig.class
     }
 )
 @PropertySource(

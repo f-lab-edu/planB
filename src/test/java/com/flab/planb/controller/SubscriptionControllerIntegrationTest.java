@@ -3,6 +3,7 @@ package com.flab.planb.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.flab.planb.config.DBConfig;
+import com.flab.planb.config.PushBatchConfig;
 import com.flab.planb.config.RootConfig;
 import com.flab.planb.config.SecurityConfig;
 import com.flab.planb.config.ServletConfig;
@@ -43,7 +44,8 @@ import org.springframework.web.util.UriComponentsBuilder;
         ServletConfig.class,
         RootConfig.class,
         DBConfig.class,
-        SecurityConfig.class
+        SecurityConfig.class,
+        PushBatchConfig.class
     }
 )
 @PropertySource(
@@ -98,10 +100,10 @@ public class SubscriptionControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("subscriptionDay 0에서 6사이에 없어서 실패")
+    @DisplayName("subscriptionDay 1에서 7사이에 없어서 실패")
     void when_subscriptionDay_none_in_between_zero_to_six_expected_bad_request() throws Exception {
         // given
-        request = new SubscriptionRequest(111L, 1L, 8L, -1, LocalTime.parse("23:00"),
+        request = new SubscriptionRequest(111L, 1L, 8L, 0, LocalTime.parse("23:00"),
                                           Map.of(1L, List.of(1L, 2L), 2L, Collections.emptyList()));
         // when
         ResultActions actions = getResultActionsOfPostRequest();
@@ -109,7 +111,7 @@ public class SubscriptionControllerIntegrationTest {
         expectBadRequest(actions, VALID_FAIL_001);
 
         // given
-        request = new SubscriptionRequest(111L, 1L, 8L, 7, LocalTime.parse("23:00"),
+        request = new SubscriptionRequest(111L, 1L, 8L, 8, LocalTime.parse("23:00"),
                                           Map.of(1L, List.of(1L, 2L), 2L, Collections.emptyList()));
         // when
         actions = getResultActionsOfPostRequest();

@@ -23,8 +23,8 @@ public class Subscription {
     private long shopId;
     @Positive(message = "회원배달주소 ID는 양수여야 합니다.")
     private long addressId;
-    @Min(value = 0, message = "구독요일 최솟값은 0(일요일) 입니다.")
-    @Max(value = 6, message = "구독요일 최댓값은 6(토요일) 입니다.")
+    @Min(value = 1, message = "구독요일 최솟값은 1(월요일) 입니다.")
+    @Max(value = 7, message = "구독요일 최댓값은 7(일요일) 입니다.")
     private int subscriptionDay;
     @TimePattern
     private LocalTime subscriptionTime;

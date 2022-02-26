@@ -12,5 +12,6 @@
     <typeAlias type="com.flab.planb.dto.subscription.request.SubscriptionRequest" alias="subscriptionRequest"/>
     <typeAlias type="com.flab.planb.dto.subscription.Subscription" alias="subscription"/>
     <typeAlias type="com.flab.planb.dto.subscription.SubscriptionMenu" alias="subscriptionMenu"/>
+    <typeAlias type="com.flab.planb.dto.subscription.PushInfo" alias="pushInfo"/>
   </typeAliases>
 </configuration>
