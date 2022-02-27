@@ -22,6 +22,7 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -72,7 +73,7 @@ public class AddressControllerUnitTest {
         // given
         Mockito.when(addressService.existById(ArgumentMatchers.anyLong())).thenReturn(0);
         // when
-        ResultActions actions = getResultActionsOfPostRequest();
+        ResultActions actions = getResultActionsRequest(getPostBuilder());
         // then
         expectBadRequest(actions, "VALID_FAIL_001");
     }
@@ -83,16 +84,102 @@ public class AddressControllerUnitTest {
         // given
         Mockito.when(addressService.existById(ArgumentMatchers.anyLong())).thenReturn(1);
         // when
-        ResultActions actions = getResultActionsOfPostRequest();
+        ResultActions actions = getResultActionsRequest(getPostBuilder());
         // then
         expectOk(actions, "등록하였습니다.");
     }
 
-    private ResultActions getResultActionsOfPostRequest() throws Exception {
-        return mockMvc.perform(
-                          MockMvcRequestBuilders.post(getUri("/address")).contentType(MediaType.APPLICATION_JSON_UTF8)
-                                                .content(objectMapper.writeValueAsString(addressDTO)))
+    @Test
+    @DisplayName("배달주소 전체 조회")
+    void when_find_all_address_expected_ok() throws Exception {
+        // given
+        Mockito.when(addressService.existById(ArgumentMatchers.anyLong())).thenReturn(1);
+        Mockito.when(addressService.findByMemberId(ArgumentMatchers.anyLong())).thenReturn(ArgumentMatchers.anyList());
+        // when
+        ResultActions actions = getResultActionsRequest(getGetBuilder("/" + addressDTO.getMemberId()));
+        // then
+        expectOk(actions, "조회에 성공하였습니다.");
+        actions.andExpect(MockMvcResultMatchers.jsonPath("$.data.result").exists());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 주소 실패")
+    void when_adress_is_not_existed_expected_bad_request() throws Exception {
+        // given
+        Mockito.when(addressService.existByMemberIdAndId(ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong()))
+               .thenReturn(0);
+        // when
+        ResultActions actions = getResultActionsRequest(getPostBuilder());
+        // then
+        expectBadRequest(actions, "VALID_FAIL_001");
+    }
+
+
+    @Test
+    @DisplayName("배달주소 단건 조회")
+    void when_find_one_address_expected_ok() throws Exception {
+        // given
+        Mockito.when(addressService.existById(ArgumentMatchers.anyLong())).thenReturn(1);
+        Mockito.when(addressService.existByMemberIdAndId(ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong()))
+               .thenReturn(1);
+        Mockito.when(addressService.findByMemberIdAndId(ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong()))
+               .thenReturn(addressDTO);
+        // when
+        ResultActions actions = getResultActionsRequest(getGetBuilder("/" + addressDTO.getMemberId()
+                                                                          + "/" + addressDTO.getId()));
+        // then
+        expectOk(actions, "조회에 성공하였습니다.");
+        actions.andExpect(MockMvcResultMatchers.jsonPath("$.data.result").exists());
+    }
+
+    @Test
+    @DisplayName("배달주소 단건 삭제")
+    void when_delete_one_address_expected_ok() throws Exception {
+        // given
+        Mockito.when(addressService.existById(ArgumentMatchers.anyLong())).thenReturn(1);
+        Mockito.when(addressService.existByMemberIdAndId(ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong()))
+               .thenReturn(1);
+        // when
+        ResultActions actions = getResultActionsRequest(getDeleteBuilder("/" + addressDTO.getMemberId()
+                                                                             + "/" + addressDTO.getId()));
+        // then
+        expectOk(actions, "삭제하였습니다.");
+    }
+
+    @Test
+    @DisplayName("배달주소 단건 수정")
+    void when_patch_one_address_expected_ok() throws Exception {
+        // given
+        Mockito.when(addressService.existById(ArgumentMatchers.anyLong())).thenReturn(1);
+        Mockito.when(addressService.existByMemberIdAndId(ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong()))
+               .thenReturn(1);
+        // when
+        ResultActions actions = getResultActionsRequest(getPatchBuilder("/" + addressDTO.getMemberId()
+                                                                            + "/" + addressDTO.getId()));
+        // then
+        expectOk(actions, "수정하였습니다.");
+    }
+
+    private ResultActions getResultActionsRequest(MockHttpServletRequestBuilder requestBuilder) throws Exception {
+        return mockMvc.perform(requestBuilder.contentType(MediaType.APPLICATION_JSON_UTF8)
+                                             .content(objectMapper.writeValueAsString(addressDTO)))
                       .andDo(MockMvcResultHandlers.print());
+    }
+
+    private MockHttpServletRequestBuilder getPostBuilder() {
+        return MockMvcRequestBuilders.post(getUri("/address"));
+    }
+
+    private MockHttpServletRequestBuilder getGetBuilder(String uri) {
+        return MockMvcRequestBuilders.get(getUri("/address" + uri));
+    }
+
+    private MockHttpServletRequestBuilder getDeleteBuilder(String uri) {
+        return MockMvcRequestBuilders.delete(getUri("/address" + uri));
+    }
+
+    private MockHttpServletRequestBuilder getPatchBuilder(String uri) {
+        return MockMvcRequestBuilders.patch(getUri("/address" + uri));
     }
 
     private void expectBadRequest(ResultActions actions, String errorCode) throws Exception {

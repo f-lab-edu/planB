@@ -6,13 +6,19 @@ import com.flab.planb.config.RootConfig;
 import com.flab.planb.config.SecurityConfig;
 import com.flab.planb.config.ServletConfig;
 import com.flab.planb.dto.member.AddressDTO;
+import com.flab.planb.dto.member.request.AddressRequest;
+import com.flab.planb.service.AddressService;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import org.hamcrest.core.IsEqual;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.MediaType;
@@ -21,6 +27,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -54,6 +61,8 @@ public class AddressControllerIntegrationTest {
     private final String VALID_FAIL_001 = "VALID_FAIL_001";
     @Autowired
     private WebApplicationContext webContext;
+    @Autowired
+    private AddressService addressService;
     private MockMvc mockMvc;
     private AddressDTO addressDTO;
 
@@ -66,20 +75,17 @@ public class AddressControllerIntegrationTest {
         mockMvc = MockMvcBuilders.webAppContextSetup(webContext)
                                  .addFilter(new CharacterEncodingFilter(StandardCharsets.UTF_8.toString(), true))
                                  .build();
-        addressDTO = AddressDTO.builder()
-                               .memberId(1L)
-                               .address("서울특별시 종로구 종로 1")
-                               .zipCode("03154")
-                               .build();
+        addressDTO = AddressDTO.builder().memberId(1L).address("서울특별시 종로구 종로 1").zipCode("03154").build();
+        addressService.saveAddress(addressDTO);
     }
 
     @Test
     @DisplayName("memberId Positive 실패")
     void when_memberId_not_positive_expected_bad_request() throws Exception {
         // given
-        addressDTO.setMemberId(0L);
+        addressDTO = AddressDTO.builder().memberId(0L).address("서울특별시 종로구 종로 1").zipCode("03154").build();
         // when
-        final ResultActions actions = getResultActionsOfPostRequest();
+        final ResultActions actions = getResultActionsRequest(getPostBuilder());
         // then
         expectBadRequest(actions, VALID_FAIL_001);
     }
@@ -88,9 +94,9 @@ public class AddressControllerIntegrationTest {
     @DisplayName("zipCode NotBlank 실패")
     void when_zipCode_is_blank_expected_bad_request() throws Exception {
         // given
-        addressDTO.setZipCode("");
+        addressDTO = AddressDTO.builder().memberId(1L).address("").zipCode("03154").build();
         // when
-        final ResultActions actions = getResultActionsOfPostRequest();
+        final ResultActions actions = getResultActionsRequest(getPostBuilder());
         // then
         expectBadRequest(actions, VALID_FAIL_001);
     }
@@ -99,9 +105,9 @@ public class AddressControllerIntegrationTest {
     @DisplayName("zipCode 숫자가 아닌 값이 있어서 실패")
     void when_zipCode_contains_non_numeric_value_expected_bad_request() throws Exception {
         // given
-        addressDTO.setZipCode("01b11");
+        addressDTO = AddressDTO.builder().memberId(1L).address("서울특별시 종로구 종로 1").zipCode("01b11").build();
         // when
-        final ResultActions actions = getResultActionsOfPostRequest();
+        final ResultActions actions = getResultActionsRequest(getPostBuilder());
         // then
         expectBadRequest(actions, VALID_FAIL_001);
     }
@@ -110,20 +116,20 @@ public class AddressControllerIntegrationTest {
     @DisplayName("zipCode 5자리 초과 실패")
     void when_zipCode_more_tan_five_digits_expected_bad_request() throws Exception {
         // given
-        addressDTO.setZipCode("012345");
+        addressDTO = AddressDTO.builder().memberId(1L).address("서울특별시 종로구 종로 1").zipCode("012345").build();
         // when
-        final ResultActions actions = getResultActionsOfPostRequest();
+        final ResultActions actions = getResultActionsRequest(getPostBuilder());
         // then
         expectBadRequest(actions, VALID_FAIL_001);
     }
 
     @Test
-    @DisplayName("address Positive 실패")
+    @DisplayName("address NotBlank 실패")
     void when_address_is_blank_expected_bad_request() throws Exception {
         // given
-        addressDTO.setAddress("");
+        addressDTO = AddressDTO.builder().memberId(1L).address("").zipCode("03154").build();
         // when
-        final ResultActions actions = getResultActionsOfPostRequest();
+        final ResultActions actions = getResultActionsRequest(getPostBuilder());
         // then
         expectBadRequest(actions, VALID_FAIL_001);
     }
@@ -132,9 +138,9 @@ public class AddressControllerIntegrationTest {
     @DisplayName("존재하지 않는 회원 ID 실패")
     void when_id_from_members_is_not_existed_expected_bad_request() throws Exception {
         // given
-        addressDTO.setMemberId(Long.MAX_VALUE);
+        addressDTO = AddressDTO.builder().memberId(Long.MAX_VALUE).address("서울특별시 종로구 종로 1").zipCode("03154").build();
         // when
-        final ResultActions actions = getResultActionsOfPostRequest();
+        final ResultActions actions = getResultActionsRequest(getPostBuilder());
         // then
         expectBadRequest(actions, VALID_FAIL_001);
     }
@@ -144,16 +150,92 @@ public class AddressControllerIntegrationTest {
     void when_new_address_expected_ok() throws Exception {
         // given
         // when
-        final ResultActions actions = getResultActionsOfPostRequest();
+        final ResultActions actions = getResultActionsRequest(getPostBuilder());
         // then
         expectOk(actions, "등록하였습니다.");
     }
 
-    private ResultActions getResultActionsOfPostRequest() throws Exception {
-        return mockMvc.perform(MockMvcRequestBuilders.post(getUri("/address"))
-                                                     .contentType(MediaType.APPLICATION_JSON_UTF8)
-                                                     .content(objectMapper.writeValueAsString(addressDTO)))
+    @Test
+    @DisplayName("배달주소 조회")
+    void when_find_address_expected_ok() throws Exception {
+        // given
+        // when
+        final ResultActions actions = getResultActionsRequest(getGetBuilder("/" + addressDTO.getMemberId()));
+        // then
+        expectOk(actions, "조회에 성공하였습니다.");
+        actions.andExpect(MockMvcResultMatchers.jsonPath("$.data.result").isNotEmpty());
+    }
+
+
+    @Test
+    @DisplayName("배달주소 단건 조회")
+    void when_find_one_address_expected_ok() throws Exception {
+        // given
+        long id = addressService.findByMemberId(addressDTO.getMemberId()).get(0).getId();
+        // when
+        ResultActions actions = getResultActionsRequest(getGetBuilder("/" + addressDTO.getMemberId() + "/" + id));
+        // then
+        expectOk(actions, "조회에 성공하였습니다.");
+        actions.andExpect(MockMvcResultMatchers.jsonPath("$.data.result").exists());
+    }
+
+    @Test
+    @DisplayName("배달주소 단건 삭제")
+    void when_delete_one_address_expected_ok() throws Exception {
+        // given
+        List<AddressDTO> address = addressService.findByMemberId(addressDTO.getMemberId());
+        // when
+        ResultActions actions = getResultActionsRequest(getDeleteBuilder("/" + addressDTO.getMemberId()
+                                                                             + "/" + address.get(address.size() - 1)
+                                                                                            .getId()));
+        // then
+        expectOk(actions, "삭제하였습니다.");
+    }
+
+    @Test
+    @DisplayName("배달주소 단건 수정")
+    void when_patch_one_address_expected_ok() throws Exception {
+        // given
+        List<AddressDTO> address = addressService.findByMemberId(addressDTO.getMemberId());
+        AddressRequest addressRequest = AddressRequest.builder().alias("배달주소").build();
+        // when
+        ResultActions actions = getResultActionsRequest(getPatchBuilder("/" + addressDTO.getMemberId()
+                                                                            + "/" + address.get(address.size() - 1)
+                                                                                           .getId()),
+                                                        addressRequest);
+        // then
+        expectOk(actions, "수정하였습니다.");
+        List<AddressDTO> findAddress = addressService.findByMemberId(addressDTO.getMemberId());
+        Assertions.assertEquals(addressRequest.getAlias(), findAddress.get(address.size() - 1).getAlias());
+    }
+
+    private ResultActions getResultActionsRequest(MockHttpServletRequestBuilder requestBuilder) throws Exception {
+        return mockMvc.perform(requestBuilder.contentType(MediaType.APPLICATION_JSON_UTF8)
+                                             .content(objectMapper.writeValueAsString(addressDTO)))
                       .andDo(MockMvcResultHandlers.print());
+    }
+
+    private ResultActions getResultActionsRequest(MockHttpServletRequestBuilder requestBuilder, Object object)
+        throws Exception {
+        return mockMvc.perform(requestBuilder.contentType(MediaType.APPLICATION_JSON_UTF8)
+                                             .content(objectMapper.writeValueAsString(object)))
+                      .andDo(MockMvcResultHandlers.print());
+    }
+
+    private MockHttpServletRequestBuilder getPostBuilder() {
+        return MockMvcRequestBuilders.post(getUri("/address"));
+    }
+
+    private MockHttpServletRequestBuilder getGetBuilder(String uri) {
+        return MockMvcRequestBuilders.get(getUri("/address" + uri));
+    }
+
+    private MockHttpServletRequestBuilder getDeleteBuilder(String uri) {
+        return MockMvcRequestBuilders.delete(getUri("/address" + uri));
+    }
+
+    private MockHttpServletRequestBuilder getPatchBuilder(String uri) {
+        return MockMvcRequestBuilders.patch(getUri("/address" + uri));
     }
 
     private void expectBadRequest(ResultActions actions, String errorCode) throws Exception {
