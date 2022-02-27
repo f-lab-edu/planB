@@ -80,6 +80,7 @@ public class DBConfig {
     public SqlSessionFactory sqlSessionFactory(DataSource dataSource) throws Exception {
         SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
         PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+        sessionFactory.setConfigLocation(resolver.getResource("classpath:mybatis-config.xml"));
         sessionFactory.setMapperLocations(resolver.getResources("classpath:mapper/**/*.xml"));
         sessionFactory.setDataSource(dataSource);
         return sessionFactory.getObject();

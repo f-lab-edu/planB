@@ -2,6 +2,7 @@ package com.flab.planb.service;
 
 import com.flab.planb.dto.member.AddressDTO;
 import com.flab.planb.service.mapper.AddressMapper;
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -33,11 +34,7 @@ public class AddressServiceTest {
     @DisplayName("주소 저장")
     void test_saveAddress() {
         // given
-        AddressDTO addressDTO = AddressDTO.builder()
-                                          .memberId(1L)
-                                          .address("서울특별시 종로구 종로 1")
-                                          .zipCode("03154")
-                                          .build();
+        AddressDTO addressDTO = AddressDTO.builder().memberId(1L).address("서울특별시 종로구 종로 1").zipCode("03154").build();
         // when
         addressMapper.saveAddress(addressDTO);
         // then
@@ -45,7 +42,7 @@ public class AddressServiceTest {
     }
 
     @Test
-    @DisplayName("회원 ID 개수 확인")
+    @DisplayName("회원 ID 존재여부 확인")
     void existById() {
         int checkCouunt = 1;
         //given
@@ -55,5 +52,58 @@ public class AddressServiceTest {
         // then
         Mockito.verify(addressMapper).existById(ArgumentMatchers.anyLong());
         Assertions.assertEquals(checkCouunt, idCount);
+    }
+
+    @Test
+    @DisplayName("회원 주소 전체 조회")
+    void findByMemberId() {
+        //given
+        // when
+        List<AddressDTO> adress = addressMapper.findByMemberId(ArgumentMatchers.anyLong());
+        // then
+        Mockito.verify(addressMapper).findByMemberId(ArgumentMatchers.anyLong());
+    }
+
+    @Test
+    @DisplayName("주소 존재여부 확인")
+    void existByMemberIdAndId() {
+        int checkCouunt = 1;
+        //given
+        Mockito.when(addressMapper.existByMemberIdAndId(ArgumentMatchers.anyMap())).thenReturn(checkCouunt);
+        // when
+        int idCount = addressMapper.existByMemberIdAndId(ArgumentMatchers.anyMap());
+        // then
+        Mockito.verify(addressMapper).existByMemberIdAndId(ArgumentMatchers.anyMap());
+        Assertions.assertEquals(checkCouunt, idCount);
+    }
+
+    @Test
+    @DisplayName("회원 주소 단건 조회")
+    void findByMemberIdAndId() {
+        //given
+        // when
+        AddressDTO adress = addressMapper.findByMemberIdAndId(ArgumentMatchers.anyMap());
+        // then
+        Mockito.verify(addressMapper).findByMemberIdAndId(ArgumentMatchers.anyMap());
+    }
+
+    @Test
+    @DisplayName("회원 주소 단건 삭제")
+    void deleteByMemberIdAndId() {
+        //given
+        // when
+        addressMapper.deleteByMemberIdAndId(ArgumentMatchers.anyMap());
+        // then
+        Mockito.verify(addressMapper).deleteByMemberIdAndId(ArgumentMatchers.anyMap());
+    }
+
+    @Test
+    @DisplayName("회원 주소 단건 수정")
+    void updateAddress() {
+        //given
+        // when
+        addressMapper.updateAddress(ArgumentMatchers.any());
+        // then
+        Mockito.verify(addressMapper).updateAddress(ArgumentMatchers.any());
     }
 }
