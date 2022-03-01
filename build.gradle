@@ -38,7 +38,16 @@ repositories {
     mavenCentral()
 }
 
-jar { manifest { attributes "Main-Class": "$mainClassName" } }
+jar {
+    manifest {
+        attributes "Main-Class": "$mainClassName"
+    }
+}
+
+task copyDependencies(type: Copy) {
+    into "$buildDir/libs/dependencies"
+    from configurations.default
+}
 
 dependencies {
     compileOnly "javax.servlet:javax.servlet-api:${ver.servletAPI}"

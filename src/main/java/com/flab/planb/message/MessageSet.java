@@ -1,6 +1,6 @@
 package com.flab.planb.message;
 
-public enum MessageCode {
+public enum MessageSet {
     VALID_FAIL("error.valid.001", "VALID_FAIL_001"),
     VALID_OVERLAP("error.valid.002", "VALID_FAIL_002"),
     VALID_SUCCEED("succeed.valid.001", "VALID_SUCCEED"),
@@ -10,21 +10,24 @@ public enum MessageCode {
     DENIED_FAIL("error.access-denied", "DENIED_FAIL"),
     AUTH_FAIL("error.authentication", "AUTH_FAIL"),
     ILLEGAL_ARGUMENT_FAIL("error.illegalargument", "ILLEGAL_ARGUMENT_FAIL"),
-    BAD_REQUEST_FAIL("error.bac-request", "BAD_REQUEST_FAIL");
+    BAD_REQUEST_FAIL("error.bac-request", "BAD_REQUEST_FAIL"),
+    SELECT_SUCCEED("succeed.select.001", "SELECT_SUCCEED"),
+    DELETE_SUCCEED("succeed.delete.001", "DELETE_SUCCEED"),
+    UPDATE_SUCCEED("succeed.update.001", "UPDATE_SUCCEED");
 
-    private final String messageKey;
-    private final String messageCode;
+    private final String lookupKey;
+    private final String code;
 
-    MessageCode(String messageKey, String messageCode) {
-        this.messageKey = messageKey;
-        this.messageCode = messageCode;
+    MessageSet(String lookupKey, String code) {
+        this.lookupKey = lookupKey;
+        this.code = code;
     }
 
-    public String getMessageKey() {
-        return this.messageKey;
+    public String getLookupKey() {
+        return this.lookupKey;
     }
 
-    public String getMessageCode() {
-        return this.messageCode;
+    public String getCode() {
+        return this.code;
     }
 }

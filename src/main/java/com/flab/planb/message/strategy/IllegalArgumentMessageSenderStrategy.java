@@ -2,7 +2,7 @@ package com.flab.planb.message.strategy;
 
 import com.flab.planb.common.MessageLookup;
 import com.flab.planb.common.ResponseWriter;
-import com.flab.planb.message.MessageCode;
+import com.flab.planb.message.MessageSet;
 import com.flab.planb.message.ResponseMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,9 +25,9 @@ public class IllegalArgumentMessageSenderStrategy implements MessageSenderStrate
         response.getWriter()
                 .write(responseWriter.messageToString(ResponseMessage.builder()
                                                                      .statusMessage(messageLookup.getMessage(
-                                                                         MessageCode.ILLEGAL_ARGUMENT_FAIL.getMessageKey()))
+                                                                         MessageSet.ILLEGAL_ARGUMENT_FAIL.getLookupKey()))
                                                                      .data(Map.of("errorCode",
-                                                                                  MessageCode.ILLEGAL_ARGUMENT_FAIL.getMessageCode()))
+                                                                                  MessageSet.ILLEGAL_ARGUMENT_FAIL.getCode()))
                                                                      .build()));
     }
 }

@@ -2,7 +2,7 @@ package com.flab.planb.message.strategy;
 
 import com.flab.planb.common.MessageLookup;
 import com.flab.planb.common.ResponseWriter;
-import com.flab.planb.message.MessageCode;
+import com.flab.planb.message.MessageSet;
 import com.flab.planb.message.ResponseMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,9 +25,9 @@ public class ExceptionMessageSenderStrategy implements MessageSenderStrategy {
         response.getWriter()
                 .write(responseWriter.messageToString(ResponseMessage.builder()
                                                                      .statusMessage(messageLookup.getMessage(
-                                                                         MessageCode.BAD_REQUEST_FAIL.getMessageKey()))
+                                                                         MessageSet.BAD_REQUEST_FAIL.getLookupKey()))
                                                                      .data(Map.of("errorCode",
-                                                                                  MessageCode.BAD_REQUEST_FAIL.getMessageCode()))
+                                                                                  MessageSet.BAD_REQUEST_FAIL.getCode()))
                                                                      .build()));
     }
 

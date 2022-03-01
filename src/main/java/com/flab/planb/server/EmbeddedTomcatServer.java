@@ -47,16 +47,16 @@ public class EmbeddedTomcatServer {
         tomcat.setBaseDir(createTempDir());
         tomcat.setPort(port);
         tomcat.getHost().setAppBase(appBase);
-        Context context = tomcat.addWebapp("", appBase);
+        Context context = tomcat.addWebapp("", new File(appBase).getAbsolutePath());
         context.setReloadable(true);
         context.setRequestCharacterEncoding(MessageLookup.ENCODIG);
         context.setResponseCharacterEncoding(MessageLookup.ENCODIG);
         AccessLogValve accessLogValve = new AccessLogValve();
-        accessLogValve.setDirectory("/logs");
+        accessLogValve.setDirectory("../logs");
         accessLogValve.setFileDateFormat("yyyy-MM-dd");
         accessLogValve.setRotatable(true);
         accessLogValve.setRequestAttributesEnabled(true);
-        accessLogValve.setPrefix("localhost_access_log");
+        accessLogValve.setPrefix("localhost_access_");
         accessLogValve.setSuffix(".log");
         accessLogValve.setPattern("%h:%p %l %u %{yyyy/MM/dd HH:mm:ss.SSS}t "
                                       + "\"%r\" %s %b \"%{Referer}i\"");

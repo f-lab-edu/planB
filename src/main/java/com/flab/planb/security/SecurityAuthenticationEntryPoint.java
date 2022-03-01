@@ -2,7 +2,7 @@ package com.flab.planb.security;
 
 import com.flab.planb.common.MessageLookup;
 import com.flab.planb.common.ResponseWriter;
-import com.flab.planb.message.MessageCode;
+import com.flab.planb.message.MessageSet;
 import com.flab.planb.message.ResponseMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,9 +31,9 @@ public class SecurityAuthenticationEntryPoint implements AuthenticationEntryPoin
         response.getWriter()
                 .write(responseWriter.messageToString(ResponseMessage.builder()
                                                                      .statusMessage(messageLookup.getMessage(
-                                                                         MessageCode.AUTH_FAIL.getMessageKey()))
+                                                                         MessageSet.AUTH_FAIL.getLookupKey()))
                                                                      .data(Map.of("errorCode",
-                                                                                  MessageCode.AUTH_FAIL.getMessageCode()))
+                                                                                  MessageSet.AUTH_FAIL.getCode()))
                                                                      .build()));
     }
 }

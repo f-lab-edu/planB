@@ -2,7 +2,7 @@ package com.flab.planb.security;
 
 import com.flab.planb.common.MessageLookup;
 import com.flab.planb.common.ResponseWriter;
-import com.flab.planb.message.MessageCode;
+import com.flab.planb.message.MessageSet;
 import com.flab.planb.message.ResponseMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -29,9 +29,9 @@ public class SecurityAuthenticationFailureHandler implements AuthenticationFailu
         response.getWriter()
                 .write(responseWriter.messageToString(ResponseMessage.builder()
                                                                      .statusMessage(messageLookup.getMessage(
-                                                                         MessageCode.LOGIN_FAIL.getMessageKey()))
+                                                                         MessageSet.LOGIN_FAIL.getLookupKey()))
                                                                      .data(Map.of("errorCode",
-                                                                                  MessageCode.LOGIN_FAIL.getMessageCode()))
+                                                                                  MessageSet.LOGIN_FAIL.getCode()))
                                                                      .build()));
     }
 }
