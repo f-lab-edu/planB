@@ -7,6 +7,7 @@
   </settings>
   <typeAliases>
     <typeAlias type="com.flab.planb.dto.member.MemberDTO" alias="memberDTO"/>
+    <typeAlias type="com.flab.planb.dto.member.LoginDTO" alias="loginDTO"/>
     <typeAlias type="com.flab.planb.dto.member.AddressDTO" alias="addressDTO"/>
     <typeAlias type="com.flab.planb.dto.member.request.AddressRequest" alias="addressRequest"/>
   </typeAliases>

@@ -10,4 +10,4 @@ Spring, Spring security, Gradle, Mysql, Mybatis, JUnit 5, OpenJDK 17, Embedded T
 
 # ER diagram
 
-<img src="https://user-images.githubusercontent.com/15783027/154798658-75eaf767-fa2f-4587-93cc-22ec1a37d6bb.png">
+<img src="https://user-images.githubusercontent.com/15783027/155497507-8af53a8c-66c3-4d21-a917-c3c57234ca42.png">

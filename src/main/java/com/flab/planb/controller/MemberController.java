@@ -2,7 +2,7 @@ package com.flab.planb.controller;
 
 import com.flab.planb.common.MessageLookup;
 import com.flab.planb.dto.member.MemberDTO;
-import com.flab.planb.message.MessageSet;
+import com.flab.planb.message.MessageCode;
 import com.flab.planb.message.ResponseMessage;
 import com.flab.planb.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +26,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final MessageLookup messageLookup;
+    private final PasswordEncoder passwordEncoder;
     private final String validKey = MessageSet.VALID_OVERLAP.getLookupKey();
     private final String validCode = MessageSet.VALID_OVERLAP.getCode();
 
@@ -51,6 +52,7 @@ public class MemberController {
             return setFail(MessageSet.INSERT_FAIL_DATA.getLookupKey(), null, MessageSet.INSERT_FAIL_DATA.getCode());
         }
 
+        memberDTO.setPasswd(passwordEncoder.encode(memberDTO.getPasswd()));
         memberService.saveMemberInfo(memberDTO);
 
         return setSucceed(MessageSet.INSERT_SUCCEED.getLookupKey());
