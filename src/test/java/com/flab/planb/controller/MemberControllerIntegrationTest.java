@@ -48,7 +48,8 @@ import java.nio.charset.StandardCharsets;
     {
         "file:src/main/resources/properties/*.properties",
         "file:src/main/resources/messages/*.properties",
-        "file:src/main/resources/logback-dev.xml"
+        "file:src/main/resources/logback-dev.xml",
+        "file:src/main/resources/mapper/*.xml"
     }
 )
 public class MemberControllerIntegrationTest {

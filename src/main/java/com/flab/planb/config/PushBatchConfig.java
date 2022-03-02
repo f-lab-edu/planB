@@ -16,6 +16,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Map;
 
 @RequiredArgsConstructor
@@ -56,8 +57,17 @@ public class PushBatchConfig {
             .pageSize(CHUNK_SIZE)
             .sqlSessionFactory(sqlSessionFactory)
             .queryId(QUERY_ID)
-            .parameterValues(Map.of("subscriptionDay", LocalDate.now().getDayOfWeek().getValue()))
+            .parameterValues(createParameterValues())
             .build();
+    }
+
+    private Map<String, Object> createParameterValues() {
+        LocalTime currentTime = LocalTime.now();
+        int subscriptionDay = LocalDate.now().getDayOfWeek().getValue() + (currentTime.getHour() < 23 ? 0 : 1);
+        LocalTime subscriptionTime = LocalTime.of(currentTime.getHour(), (currentTime.getMinute() < 30 ? 0 : 30))
+                                              .plusHours(1);
+
+        return Map.of("subscriptionDay", subscriptionDay, "subscriptionTime", subscriptionTime);
     }
 
     private ItemWriter<PushInfo> jdbcPagingItemWriter() {
