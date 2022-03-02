@@ -7,6 +7,7 @@ import com.flab.planb.service.mapper.SubscriptionMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -16,6 +17,16 @@ public class SubscriptionService {
 
     private final SubscriptionMapper subscriptionMapper;
 
+    @Transactional
+    public void saveSubscriptionInfo(SubscriptionRequest request) {
+        saveSubscription(request);
+        log.debug("subscription id : {}", request.getId());
+
+        List<SubscriptionMenu> menus = getSubscriptionMenus(request);
+        saveSubscriptionMenus(menus);
+        saveSubscriptionMenuOptions(menus);
+    }
+
     public void saveSubscription(Subscription subscription) {
         subscriptionMapper.saveSubscription(subscription);
     }
@@ -24,13 +35,24 @@ public class SubscriptionService {
         return subscriptionMapper.existsDuplicateSubscription(subscriptionRequest);
     }
 
-    public void saveSubscriptionMenus(List<SubscriptionMenu> subscriptionMenus) {
-        subscriptionMapper.saveSubscriptionMenus(subscriptionMenus);
+    public void saveSubscriptionMenus(List<SubscriptionMenu> menus) {
+        subscriptionMapper.saveSubscriptionMenus(menus);
+        menus.forEach(m -> log.debug("subscription id : {}, menu id : {}", m.getSubscriptionId(), m.getMenuId()));
     }
 
     public void saveSubscriptionMenuOptions(List<SubscriptionMenu> subscriptionMenus) {
         subscriptionMenus.stream().filter(m -> !m.getMenuOptions().isEmpty())
                          .forEach(subscriptionMapper::saveSubscriptionMenuOptions);
+    }
+
+    private List<SubscriptionMenu> getSubscriptionMenus(SubscriptionRequest request) {
+        return request.getSubscriptionMenus()
+                      .entrySet().stream()
+                      .map(e -> new SubscriptionMenu(
+                          request.getId(),
+                          e.getKey(),
+                          e.getValue()))
+                      .toList();
     }
 
 }
