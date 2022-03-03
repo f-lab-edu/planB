@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 public class ExceptionAdvice {
 
-    private final ResponseEntityBuilder responseEntityBuilder;
+    private final MessageLookup messageLookup;
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> methodValidException(MethodArgumentNotValidException exception,

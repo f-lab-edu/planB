@@ -1,4 +1,4 @@
-package com.flab.planb.controller;
+package com.flab.planb.service;
 
 import com.flab.planb.dto.shop.ShopInfo;
 import com.flab.planb.dto.subscription.Subscription;
