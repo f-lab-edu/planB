@@ -25,7 +25,8 @@ def ver = [
         hamcrest      : '2.2',
         jsonPath      : '2.6.0',
         jasypt        : '1.9.3',
-        lang3         : '3.12.0'
+        lang3         : '3.12.0',
+        shedlock      : '4.33.0'
 ]
 
 group 'com.flab'
@@ -57,6 +58,8 @@ dependencies {
     implementation "org.springframework.security:spring-security-web:${ver.springSecurity}"
     implementation "org.springframework.security:spring-security-config:${ver.springSecurity}"
     implementation "org.springframework.batch:spring-batch-core:${ver.springBatch}"
+    implementation "net.javacrumbs.shedlock:shedlock-spring:${ver.shedlock}"
+    implementation "net.javacrumbs.shedlock:shedlock-provider-jdbc-template:${ver.shedlock}"
     implementation("com.zaxxer:HikariCP:${ver.hikari}") { exclude module: 'slf4j-api' exclude group: 'org.slf4j' }
     implementation("org.mybatis:mybatis:${ver.mybatis}") { exclude module: 'log4j' exclude group: 'log4j' }
     implementation "org.mybatis:mybatis-spring:${ver.mybatisSpring}"
@@ -65,6 +68,8 @@ dependencies {
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${ver.jackson}"
     implementation "org.jasypt:jasypt:${ver.jasypt}"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${ver.junit}"
+    testCompileOnly "org.projectlombok:lombok:${ver.lombok}"
+    testAnnotationProcessor "org.projectlombok:lombok:${ver.lombok}"
     testImplementation "org.springframework:spring-test:${ver.spring}"
     testImplementation "org.mockito:mockito-junit-jupiter:${ver.mockito}"
     testImplementation "org.junit.jupiter:junit-jupiter-api:${ver.junit}"

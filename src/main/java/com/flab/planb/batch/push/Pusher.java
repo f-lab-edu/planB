@@ -1,15 +1,15 @@
 package com.flab.planb.batch.push;
 
-import com.flab.planb.dto.subscription.PushInfo;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class Pusher {
+public class Pusher<T> {
 
-    public void push(PushInfo pushInfo) {
-        log.info("current push info : {}", pushInfo.toString());
+    public void push(List<? extends T> items) {
+        log.info("current items info : {}", items.toString());
     }
 
 }
