@@ -37,7 +37,7 @@
     update planb.tbl_member_address
     <trim prefix="set" suffixOverrides=",">
       <if test="alias != null and alias != ''">alias = #{alias},</if>
-      <if test="zipCode != null and zipCode != ''">zipCode = #{zipCode},</if>
+      <if test="zipCode != null and zipCode != ''">zip_code = #{zipCode},</if>
       <if test="address != null and address != ''">address = #{address},</if>
     </trim>
     where id = #{id}

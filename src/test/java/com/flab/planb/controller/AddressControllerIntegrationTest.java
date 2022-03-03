@@ -17,8 +17,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.MediaType;
@@ -197,16 +195,41 @@ public class AddressControllerIntegrationTest {
     void when_patch_one_address_expected_ok() throws Exception {
         // given
         List<AddressDTO> address = addressService.findByMemberId(addressDTO.getMemberId());
-        AddressRequest addressRequest = AddressRequest.builder().alias("배달주소").build();
+        AddressRequest aliasPatchRequest = AddressRequest.builder().alias("배달주소").build();
         // when
-        ResultActions actions = getResultActionsRequest(getPatchBuilder("/" + addressDTO.getMemberId()
-                                                                            + "/" + address.get(address.size() - 1)
-                                                                                           .getId()),
-                                                        addressRequest);
+        ResultActions actions = getResultActionsRequest(
+            getPatchBuilder("/" + addressDTO.getMemberId() + "/" + address.get(address.size() - 1).getId()),
+            aliasPatchRequest);
         // then
+        expectPatchSucceed(actions, aliasPatchRequest, "alias");
+
+        // given
+        AddressRequest addressPatchRequest = AddressRequest.builder().zipCode("01234").address("서울시 강남구 삼성동").build();
+        // when
+        actions = getResultActionsRequest(
+            getPatchBuilder("/" + addressDTO.getMemberId() + "/" + address.get(address.size() - 1).getId()),
+            addressPatchRequest);
+        // then
+        expectPatchSucceed(actions, addressPatchRequest, "address");
+    }
+
+    private void expectPatchSucceed(ResultActions actions, AddressRequest request, String check)
+        throws Exception {
         expectOk(actions, "수정하였습니다.");
+        expectPatchedData(request, check);
+    }
+
+    private void expectPatchedData(AddressRequest request, String check) {
         List<AddressDTO> findAddress = addressService.findByMemberId(addressDTO.getMemberId());
-        Assertions.assertEquals(addressRequest.getAlias(), findAddress.get(address.size() - 1).getAlias());
+        switch (check) {
+            case "alias" -> {
+                Assertions.assertEquals(request.getAlias(), findAddress.get(findAddress.size() - 1).getAlias());
+            }
+            case "address" -> {
+                Assertions.assertEquals(request.getAddress(), findAddress.get(findAddress.size() - 1).getAddress());
+                Assertions.assertEquals(request.getZipCode(), findAddress.get(findAddress.size() - 1).getZipCode());
+            }
+        }
     }
 
     private ResultActions getResultActionsRequest(MockHttpServletRequestBuilder requestBuilder) throws Exception {
