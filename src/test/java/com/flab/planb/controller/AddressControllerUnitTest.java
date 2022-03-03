@@ -4,14 +4,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flab.planb.common.ExceptionAdvice;
 import com.flab.planb.common.MessageLookup;
 import com.flab.planb.dto.member.AddressDTO;
+import com.flab.planb.dto.member.request.AddressRequest;
 import com.flab.planb.service.AddressService;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import org.hamcrest.core.IsEqual;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -158,6 +161,32 @@ public class AddressControllerUnitTest {
                                                                             + "/" + addressDTO.getId()));
         // then
         expectOk(actions, "수정하였습니다.");
+    }
+
+    @Test
+    @DisplayName("우편번호 또는 주소 하나만 공백으로 배달주소 단건 수정 실패")
+    void when_blank_patch_zipCode_or_address_expected_throws() {
+        try {
+            AddressRequest.builder().zipCode("").address("서울시 강남구 삼성동").build();
+        } catch (IllegalArgumentException e) {
+            Assertions.assertEquals("AddressRequestBuilder is not valid", e.getMessage());
+        }
+
+        try {
+            AddressRequest.builder().zipCode("01234").address("").build();
+        } catch (IllegalArgumentException e) {
+            Assertions.assertEquals("AddressRequestBuilder is not valid", e.getMessage());
+        }
+    }
+
+    @Test
+    @DisplayName("우편번호 패턴 틀려서 배달주소 단건 수정 실패")
+    void when_patch_zipCode_pattern_not_valid_expected_throws() {
+        try {
+            AddressRequest.builder().zipCode("111111").address("서울시 강남구 삼성동").build();
+        } catch (IllegalArgumentException e) {
+            Assertions.assertEquals("AddressRequestBuilder is not valid", e.getMessage());
+        }
     }
 
     private ResultActions getResultActionsRequest(MockHttpServletRequestBuilder requestBuilder) throws Exception {
