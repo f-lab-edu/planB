@@ -3,6 +3,7 @@ package com.flab.planb.controller;
 import com.flab.planb.common.ResponseEntityBuilder;
 import com.flab.planb.dto.subscription.request.SubscriptionRequest;
 import com.flab.planb.message.MessageSet;
+import com.flab.planb.service.ShopInfoCheck;
 import com.flab.planb.service.SubscriptionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
