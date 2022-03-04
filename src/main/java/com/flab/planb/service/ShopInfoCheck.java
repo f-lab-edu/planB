@@ -1,9 +1,6 @@
 package com.flab.planb.service;
 
-import com.flab.planb.dto.shop.ShopInfo;
 import com.flab.planb.dto.subscription.Subscription;
-import com.flab.planb.service.ShopBusinessDayService;
-import com.flab.planb.service.ShopInfoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -22,8 +19,7 @@ public class ShopInfoCheck {
     }
 
     private boolean isNotExist(Subscription subscription) {
-        getShopInfo(subscription.getShopId());
-        return false;
+        return shopInfoService.existsByShopId(subscription.getShopId()) == 0;
     }
 
     private boolean isDayOff(Subscription subscription) {
@@ -33,10 +29,6 @@ public class ShopInfoCheck {
 
     private boolean isNotOpen(Subscription subscription) {
         return shopBusinessDayService.existsWorkingDay(subscription) == 0;
-    }
-
-    private ShopInfo getShopInfo(long shopId) {
-        return shopInfoService.findByShopId(shopId);
     }
 
 }
