@@ -1,6 +1,6 @@
 package com.flab.planb.service.mapper;
 
-import com.flab.planb.dto.subscription.PushInfo;
+import com.flab.planb.dto.push.PushInfo;
 import com.flab.planb.dto.subscription.Subscription;
 import com.flab.planb.dto.subscription.SubscriptionMenu;
 import com.flab.planb.dto.subscription.request.SubscriptionRequest;

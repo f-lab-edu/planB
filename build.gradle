@@ -26,7 +26,9 @@ def ver = [
         jsonPath      : '2.6.0',
         jasypt        : '1.9.3',
         lang3         : '3.12.0',
-        shedlock      : '4.33.0'
+        shedlock      : '4.33.0',
+        firebase      : '8.1.0',
+        netty         : '4.1.74.Final'
 ]
 
 group 'com.flab'
@@ -67,6 +69,7 @@ dependencies {
     implementation "com.fasterxml.jackson.core:jackson-databind:${ver.jackson}"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${ver.jackson}"
     implementation "org.jasypt:jasypt:${ver.jasypt}"
+    implementation "com.google.firebase:firebase-admin:${ver.firebase}"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${ver.junit}"
     testCompileOnly "org.projectlombok:lombok:${ver.lombok}"
     testAnnotationProcessor "org.projectlombok:lombok:${ver.lombok}"
