@@ -14,18 +14,24 @@
              )
   </select>
   <select id="findPushList" parameterType="map" resultType="pushInfo">
-    select subscription.member_id,
-           group_concat(business.name) as name,
+    select members.fcm_token,
+           subscription.member_id,
+           group_concat(business.name) as shop_name,
            subscription.subscription_day,
            subscription.subscription_time
     from (
-           select member_id, shop_id, subscription_day, date_format(subscription_time, '%H:%i') as subscription_time
+           select member_id,
+                  shop_id,
+                  subscription_day,
+                  date_format(subscription_time, '%H:%i') as subscription_time
            from planb.tbl_subscription
            where subscription_day = #{subscriptionDay}
              and subscription_time = #{subscriptionTime}
            order by member_id
              limit #{_skiprows}, #{_pagesize}
-         ) subscription,
+         ) subscription
+           inner join planb.tbl_members members
+                      on subscription.member_id = members.id,
          (select id, name from planb.tbl_business_info) business
     where business.id = subscription.shop_id
     group by subscription.member_id, subscription.subscription_day, subscription.subscription_time

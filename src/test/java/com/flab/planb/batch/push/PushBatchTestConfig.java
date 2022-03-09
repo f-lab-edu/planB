@@ -18,6 +18,7 @@ import org.springframework.batch.item.database.Order;
 import org.springframework.batch.item.database.PagingQueryProvider;
 import org.springframework.batch.item.database.builder.JdbcPagingItemReaderBuilder;
 import org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
@@ -32,6 +33,7 @@ public class PushBatchTestConfig {
 
     private static final String JOB_NAME = "pushSchedulerTestJob";
     private static final String STEP_NAME = "pushSchedulerTestStep";
+    private static final String FAIL_STEP_NAME = "printFailedTestStep";
     private static final int CHUNK_SIZE = 10;
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
@@ -42,6 +44,7 @@ public class PushBatchTestConfig {
         return jobBuilderFactory.get(JOB_NAME)
                                 .preventRestart()
                                 .start(pushStep())
+                                .next(printFailedList())
                                 .build();
     }
 
@@ -50,7 +53,7 @@ public class PushBatchTestConfig {
         return stepBuilderFactory.get(STEP_NAME)
                                  .<Count, Count>chunk(CHUNK_SIZE)
                                  .reader(mybatisItemReader())
-                                 .writer(new CustomItemWriter<>())
+                                 .writer(itemWriter())
                                  .taskExecutor(taskExecutor())
                                  .build();
     }
@@ -65,6 +68,21 @@ public class PushBatchTestConfig {
             .queryProvider(createQueryProvider())
             .name("jdbcPagingItemReader")
             .build();
+    }
+
+    @Bean
+    public CustomItemWriter<Count> itemWriter() {
+        return new CustomItemWriter<>(testPusher());
+    }
+
+    @Bean
+    public Step printFailedList() {
+        return stepBuilderFactory
+            .get(FAIL_STEP_NAME)
+            .tasklet((contribution, chunkContext) -> {
+                testPusher().getFailedList().forEach(item -> log.info(item.toString()));
+                return RepeatStatus.FINISHED;
+            }).build();
     }
 
     @Bean
@@ -83,6 +101,11 @@ public class PushBatchTestConfig {
     }
 
     @Bean
+    public TestPusher<Count> testPusher() {
+        return new TestPusher<>();
+    }
+
+    @Bean
     public TaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(5);
@@ -94,6 +117,7 @@ public class PushBatchTestConfig {
     }
 
 }
+
 
 @NoArgsConstructor
 @Getter

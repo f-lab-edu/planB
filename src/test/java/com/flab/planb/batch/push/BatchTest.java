@@ -4,6 +4,7 @@ import com.flab.planb.config.DBConfig;
 import java.sql.Date;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.batch.core.JobExecution;
@@ -44,6 +45,7 @@ public class BatchTest {
             new JobParametersBuilder()
                 .addDate(KEY, Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()))
                 .toJobParameters());
+        Assertions.assertEquals(pushBatchTestConfig.testPusher().getFailedList().size(), 200);
     }
 
 }

@@ -12,6 +12,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.valves.AccessLogValve;
 import org.apache.commons.io.IOCase;
 import org.apache.commons.io.filefilter.PrefixFileFilter;
+import org.apache.tomcat.util.scan.StandardJarScanner;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import java.io.File;
@@ -51,6 +52,7 @@ public class EmbeddedTomcatServer {
         context.setReloadable(true);
         context.setRequestCharacterEncoding(MessageLookup.ENCODIG);
         context.setResponseCharacterEncoding(MessageLookup.ENCODIG);
+        ((StandardJarScanner) context.getJarScanner()).setScanManifest(false);
         AccessLogValve accessLogValve = new AccessLogValve();
         accessLogValve.setDirectory("/logs");
         accessLogValve.setFileDateFormat("yyyy-MM-dd");
