@@ -2,6 +2,7 @@ package com.flab.planb.controller;
 
 import com.flab.planb.TestUtils;
 import com.flab.planb.config.DBConfig;
+import com.flab.planb.config.PushBatchConfig;
 import com.flab.planb.config.RootConfig;
 import com.flab.planb.config.SecurityConfig;
 import com.flab.planb.config.ServletConfig;
@@ -32,7 +33,8 @@ import org.springframework.web.filter.CharacterEncodingFilter;
         ServletConfig.class,
         RootConfig.class,
         DBConfig.class,
-        SecurityConfig.class
+        SecurityConfig.class,
+        PushBatchConfig.class
     }
 )
 @PropertySource(
