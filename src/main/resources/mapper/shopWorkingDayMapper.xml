@@ -2,11 +2,8 @@
 <!DOCTYPE mapper
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.flab.planb.service.mapper.ShopBusinessDayMapper">
-  <select id="existsDayoff" parameterType="subscription" resultType="int">
-    select exists(select shop_id from planb.tbl_shop_dayoff where shop_id = #{shopId} and `day` = #{subscriptionDay})
-  </select>
-  <select id="existsWorkingDay" parameterType="subscription" resultType="int">
+<mapper namespace="com.flab.planb.service.mapper.ShopWorkingDayMapper">
+  <select id="exists" parameterType="com.flab.planb.dto.subscription.Subscription" resultType="int">
     select exists(
              select shop_id
              from planb.tbl_shop_working_day

@@ -6,11 +6,12 @@
     <setting name="callSettersOnNulls" value="true"/>
   </settings>
   <typeAliases>
-    <typeAlias type="com.flab.planb.dto.member.MemberDTO" alias="memberDTO"/>
+    <typeAlias type="com.flab.planb.dto.member.Member" alias="member"/>
     <typeAlias type="com.flab.planb.dto.shop.ShopInfo" alias="shopInfo"/>
     <typeAlias type="com.flab.planb.dto.shop.ShopDayoff" alias="shopDayoff"/>
     <typeAlias type="com.flab.planb.dto.subscription.request.SubscriptionRequest" alias="subscriptionRequest"/>
     <typeAlias type="com.flab.planb.dto.subscription.Subscription" alias="subscription"/>
     <typeAlias type="com.flab.planb.dto.subscription.SubscriptionMenu" alias="subscriptionMenu"/>
+    <typeAlias type="com.flab.planb.dto.push.PushInfo" alias="pushInfo"/>
   </typeAliases>
 </configuration>

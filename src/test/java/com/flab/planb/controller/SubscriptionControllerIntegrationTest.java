@@ -1,8 +1,8 @@
 package com.flab.planb.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.flab.planb.TestUtils;
 import com.flab.planb.config.DBConfig;
+import com.flab.planb.config.PushBatchConfig;
 import com.flab.planb.config.RootConfig;
 import com.flab.planb.config.SecurityConfig;
 import com.flab.planb.config.ServletConfig;
@@ -13,22 +13,17 @@ import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import org.hamcrest.core.IsEqual;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
@@ -43,19 +38,21 @@ import org.springframework.web.util.UriComponentsBuilder;
         ServletConfig.class,
         RootConfig.class,
         DBConfig.class,
-        SecurityConfig.class
+        SecurityConfig.class,
+        PushBatchConfig.class
     }
 )
 @PropertySource(
     {
         "file:src/main/resources/properties/*.properties",
         "file:src/main/resources/messages/*.properties",
-        "file:src/main/resources/logback-dev.xml"
+        "file:src/main/resources/logback-dev.xml",
+        "file:src/main/resources/mapper/*.xml"
     }
 )
 public class SubscriptionControllerIntegrationTest {
 
-    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    private final String URI = "/subscription";
     private final String VALID_FAIL_001 = "VALID_FAIL_001";
     @Autowired
     private WebApplicationContext webContext;
@@ -80,9 +77,9 @@ public class SubscriptionControllerIntegrationTest {
         request = new SubscriptionRequest(0L, 1L, 8L, 5, LocalTime.parse("23:00"),
                                           Map.of(1L, List.of(1L, 2L), 2L, Collections.emptyList()));
         // when
-        ResultActions actions = getResultActionsOfPostRequest();
+        ResultActions actions = TestUtils.requestPost(mockMvc, URI, request);
         // then
-        expectBadRequest(actions, VALID_FAIL_001);
+        TestUtils.expectBadRequest(actions, VALID_FAIL_001);
     }
 
     @Test
@@ -92,9 +89,9 @@ public class SubscriptionControllerIntegrationTest {
         request = new SubscriptionRequest(111L, 1L, 0L, 5, LocalTime.parse("23:00"),
                                           Map.of(1L, List.of(1L, 2L), 2L, Collections.emptyList()));
         // when
-        ResultActions actions = getResultActionsOfPostRequest();
+        ResultActions actions = TestUtils.requestPost(mockMvc, URI, request);
         // then
-        expectBadRequest(actions, VALID_FAIL_001);
+        TestUtils.expectBadRequest(actions, VALID_FAIL_001);
     }
 
     @Test
@@ -104,17 +101,17 @@ public class SubscriptionControllerIntegrationTest {
         request = new SubscriptionRequest(111L, 1L, 8L, 0, LocalTime.parse("23:00"),
                                           Map.of(1L, List.of(1L, 2L), 2L, Collections.emptyList()));
         // when
-        ResultActions actions = getResultActionsOfPostRequest();
+        ResultActions actions = TestUtils.requestPost(mockMvc, URI, request);
         // then
-        expectBadRequest(actions, VALID_FAIL_001);
+        TestUtils.expectBadRequest(actions, VALID_FAIL_001);
 
         // given
         request = new SubscriptionRequest(111L, 1L, 8L, 8, LocalTime.parse("23:00"),
                                           Map.of(1L, List.of(1L, 2L), 2L, Collections.emptyList()));
         // when
-        actions = getResultActionsOfPostRequest();
+        actions = TestUtils.requestPost(mockMvc, URI, request);
         // then
-        expectBadRequest(actions, VALID_FAIL_001);
+        TestUtils.expectBadRequest(actions, VALID_FAIL_001);
     }
 
     @Test
@@ -124,17 +121,17 @@ public class SubscriptionControllerIntegrationTest {
         request = new SubscriptionRequest(111L, 1L, 8L, 5, LocalTime.parse("00:25"),
                                           Map.of(1L, List.of(1L, 2L), 2L, Collections.emptyList()));
         // when
-        ResultActions actions = getResultActionsOfPostRequest();
+        ResultActions actions = TestUtils.requestPost(mockMvc, URI, request);
         // then
-        expectBadRequest(actions, VALID_FAIL_001);
+        TestUtils.expectBadRequest(actions, VALID_FAIL_001);
 
         // given
         request = new SubscriptionRequest(111L, 1L, 8L, 5, LocalTime.parse("23:59"),
                                           Map.of(1L, List.of(1L, 2L), 2L, Collections.emptyList()));
         // when
-        actions = getResultActionsOfPostRequest();
+        actions = TestUtils.requestPost(mockMvc, URI, request);
         // then
-        expectBadRequest(actions, VALID_FAIL_001);
+        TestUtils.expectBadRequest(actions, VALID_FAIL_001);
     }
 
     @Test
@@ -144,9 +141,9 @@ public class SubscriptionControllerIntegrationTest {
         request = new SubscriptionRequest(111L, Long.MAX_VALUE, 8L, 5, LocalTime.parse("23:00"),
                                           Collections.emptyMap());
         // when
-        ResultActions actions = getResultActionsOfPostRequest();
+        ResultActions actions = TestUtils.requestPost(mockMvc, URI, request);
         // then
-        expectBadRequest(actions, VALID_FAIL_001);
+        TestUtils.expectBadRequest(actions, VALID_FAIL_001);
     }
 
     @Test
@@ -156,9 +153,9 @@ public class SubscriptionControllerIntegrationTest {
         request = new SubscriptionRequest(111L, Long.MAX_VALUE, 8L, 5, LocalTime.parse("23:00"),
                                           Map.of(1L, List.of(1L, 2L), 2L, Collections.emptyList()));
         // when
-        ResultActions actions = getResultActionsOfPostRequest();
+        ResultActions actions = TestUtils.requestPost(mockMvc, URI, request);
         // then
-        expectBadRequest(actions, VALID_FAIL_001);
+        TestUtils.expectBadRequest(actions, VALID_FAIL_001);
     }
 
     @Test
@@ -168,9 +165,9 @@ public class SubscriptionControllerIntegrationTest {
         request = new SubscriptionRequest(111L, 1L, 8L, 5, LocalTime.parse("23:00"),
                                           Map.of(1L, List.of(1L, 2L), 2L, Collections.emptyList()));
         // when
-        ResultActions actions = getResultActionsOfPostRequest();
+        ResultActions actions = TestUtils.requestPost(mockMvc, URI, request);
         // then
-        expectBadRequest(actions, VALID_FAIL_001);
+        TestUtils.expectBadRequest(actions, VALID_FAIL_001);
     }
 
     @Test
@@ -180,9 +177,9 @@ public class SubscriptionControllerIntegrationTest {
         request = new SubscriptionRequest(111L, 1L, 8L, 2, LocalTime.parse("23:00"),
                                           Map.of(1L, List.of(1L, 2L), 2L, Collections.emptyList()));
         // when
-        ResultActions actions = getResultActionsOfPostRequest();
+        ResultActions actions = TestUtils.requestPost(mockMvc, URI, request);
         // then
-        expectBadRequest(actions, VALID_FAIL_001);
+        TestUtils.expectBadRequest(actions, VALID_FAIL_001);
     }
 
     @Test
@@ -192,9 +189,9 @@ public class SubscriptionControllerIntegrationTest {
         request = new SubscriptionRequest(111L, 1L, 8L, 1, LocalTime.parse("12:00"),
                                           Map.of(1L, List.of(1L, 2L), 2L, Collections.emptyList()));
         // when
-        ResultActions actions = getResultActionsOfPostRequest();
+        ResultActions actions = TestUtils.requestPost(mockMvc, URI, request);
         // then
-        expectBadRequest(actions, VALID_FAIL_001);
+        TestUtils.expectBadRequest(actions, VALID_FAIL_001);
     }
 
     @Test
@@ -204,28 +201,9 @@ public class SubscriptionControllerIntegrationTest {
         request = new SubscriptionRequest(111L, 1L, 8L, 2, LocalTime.parse("12:00"),
                                           Map.of(1L, List.of(1L, 2L), 2L, Collections.emptyList()));
         // when
-        ResultActions actions = getResultActionsOfPostRequest();
+        ResultActions actions = TestUtils.requestPost(mockMvc, URI, request);
         // then
-        expectOk(actions, "등록하였습니다.");
-    }
-
-    private ResultActions getResultActionsOfPostRequest() throws Exception {
-        return mockMvc.perform(MockMvcRequestBuilders.post(getUri("/subscription"))
-                                                     .contentType(MediaType.APPLICATION_JSON_UTF8)
-                                                     .content(objectMapper.writeValueAsString(request)))
-                      .andDo(MockMvcResultHandlers.print());
-    }
-
-    private void expectBadRequest(ResultActions actions, String errorCode) throws Exception {
-        actions.andExpect(MockMvcResultMatchers.status().isBadRequest())
-               .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8))
-               .andExpect(MockMvcResultMatchers.jsonPath("$.data.errorCode").value(IsEqual.equalTo(errorCode)));
-    }
-
-    private void expectOk(ResultActions actions, String statusMessage) throws Exception {
-        actions.andExpect(MockMvcResultMatchers.status().isOk())
-               .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8))
-               .andExpect(MockMvcResultMatchers.jsonPath("$.statusMessage").value(IsEqual.equalTo(statusMessage)));
+        TestUtils.expectOk(actions, "등록하였습니다.");
     }
 
 }

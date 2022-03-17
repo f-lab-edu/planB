@@ -7,15 +7,15 @@ import javax.validation.ConstraintValidatorContext;
 
 public class TimePatternValidator implements ConstraintValidator<TimePattern, LocalTime> {
 
-    private String pattern;
+    private Pattern pattern;
 
     @Override
     public void initialize(TimePattern constraintAnnotation) {
-        this.pattern = constraintAnnotation.pattern();
+        this.pattern = Pattern.compile(constraintAnnotation.pattern());
     }
 
     @Override
     public boolean isValid(LocalTime value, ConstraintValidatorContext context) {
-        return Pattern.compile(pattern).matcher(value.toString()).matches();
+        return pattern.matcher(value.toString()).matches();
     }
 }
