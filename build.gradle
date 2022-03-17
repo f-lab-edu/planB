@@ -10,8 +10,8 @@ def ver = [
         tomcat        : '9.0.53',
         commonIO      : '2.11.0',
         commonLang    : '3.12.0',
-        junit         : '5.8.1',
-        mockito       : '4.0.0',
+        junit         : '5.8.2',
+        mockito       : '4.2.0',
         slf4j         : '1.7.32',
         logback       : '1.2.10',
         logbackExt    : '0.1.5',
@@ -38,16 +38,7 @@ repositories {
     mavenCentral()
 }
 
-jar {
-    manifest {
-        attributes "Main-Class": "$mainClassName"
-    }
-}
-
-task copyDependencies(type: Copy) {
-    into "$buildDir/libs/dependencies"
-    from configurations.default
-}
+jar { manifest { attributes "Main-Class": "$mainClassName" } }
 
 dependencies {
     compileOnly "javax.servlet:javax.servlet-api:${ver.servletAPI}"
@@ -63,6 +54,7 @@ dependencies {
     implementation "org.apache.tomcat.embed:tomcat-embed-core:${ver.tomcat}"
     implementation "org.apache.tomcat.embed:tomcat-embed-jasper:${ver.tomcat}"
     implementation "org.springframework:spring-webmvc:${ver.spring}"
+    implementation "org.springframework:spring-aspects:${ver.spring}"
     implementation "org.springframework:spring-jdbc:${ver.spring}"
     implementation "org.springframework.security:spring-security-web:${ver.springSecurity}"
     implementation "org.springframework.security:spring-security-config:${ver.springSecurity}"
