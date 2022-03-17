@@ -29,11 +29,8 @@ public class SecurityAuthenticationEntryPoint implements AuthenticationEntryPoin
     ) throws IOException {
         responseWriter.setHeader(response, HttpStatus.UNAUTHORIZED);
         response.getWriter()
-                .write(responseWriter.messageToString(ResponseMessage.builder()
-                                                                     .statusMessage(messageLookup.getMessage(
-                                                                         MessageSet.AUTH_FAIL.getLookupKey()))
-                                                                     .data(Map.of("errorCode",
-                                                                                  MessageSet.AUTH_FAIL.getCode()))
-                                                                     .build()));
+                .write(responseWriter.messageToString(
+                    new ResponseMessage(messageLookup.getMessage(MessageSet.AUTH_FAIL.getLookupKey()),
+                                        Map.of("errorCode", MessageSet.AUTH_FAIL.getCode()))));
     }
 }

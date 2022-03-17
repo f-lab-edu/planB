@@ -3,6 +3,7 @@ package com.flab.planb.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flab.planb.common.ExceptionAdvice;
 import com.flab.planb.common.MessageLookup;
+import com.flab.planb.common.ResponseEntityBuilder;
 import com.flab.planb.dto.member.AddressDTO;
 import com.flab.planb.dto.member.request.AddressRequest;
 import com.flab.planb.service.AddressService;
@@ -39,6 +40,7 @@ public class AddressControllerUnitTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private static final ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
     private final MessageLookup messageLookup = Mockito.spy(new MessageLookup(messageSource));
+    private final ResponseEntityBuilder responseEntityBuilder = Mockito.spy(new ResponseEntityBuilder(messageLookup));
     @Mock
     private AddressService addressService;
     @InjectMocks

@@ -2,6 +2,7 @@ package com.flab.planb.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flab.planb.config.DBConfig;
+import com.flab.planb.config.PushBatchConfig;
 import com.flab.planb.config.RootConfig;
 import com.flab.planb.config.SecurityConfig;
 import com.flab.planb.config.ServletConfig;
@@ -43,14 +44,16 @@ import org.springframework.web.util.UriComponentsBuilder;
         ServletConfig.class,
         RootConfig.class,
         DBConfig.class,
-        SecurityConfig.class
+        SecurityConfig.class,
+        PushBatchConfig.class
     }
 )
 @PropertySource(
     {
         "file:src/main/resources/properties/*.properties",
         "file:src/main/resources/messages/*.properties",
-        "file:src/main/resources/logback-dev.xml"
+        "file:src/main/resources/logback-dev.xml",
+        "file:src/main/resources/mapper/*.xml"
     }
 )
 public class AddressControllerIntegrationTest {

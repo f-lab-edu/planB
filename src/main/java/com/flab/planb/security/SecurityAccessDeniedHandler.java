@@ -29,11 +29,8 @@ public class SecurityAccessDeniedHandler implements AccessDeniedHandler {
     ) throws IOException {
         responseWriter.setHeader(response, HttpStatus.FORBIDDEN);
         response.getWriter()
-                .write(responseWriter.messageToString(ResponseMessage.builder()
-                                                                     .statusMessage(messageLookup.getMessage(
-                                                                         MessageSet.DENIED_FAIL.getLookupKey()))
-                                                                     .data(Map.of("errorCode",
-                                                                                  MessageSet.DENIED_FAIL.getCode()))
-                                                                     .build()));
+                .write(responseWriter.messageToString(
+                    new ResponseMessage(messageLookup.getMessage(MessageSet.DENIED_FAIL.getLookupKey()),
+                                        Map.of("errorCode", MessageSet.DENIED_FAIL.getCode()))));
     }
 }

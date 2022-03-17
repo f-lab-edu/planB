@@ -2,11 +2,12 @@ package com.flab.planb.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flab.planb.config.DBConfig;
+import com.flab.planb.config.PushBatchConfig;
 import com.flab.planb.config.RootConfig;
 import com.flab.planb.config.SecurityConfig;
 import com.flab.planb.config.ServletConfig;
 import com.flab.planb.dto.member.LoginDTO;
-import com.flab.planb.dto.member.MemberDTO;
+import com.flab.planb.dto.member.Member;
 import com.flab.planb.service.MemberService;
 import org.hamcrest.core.IsEqual;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,14 +45,16 @@ import java.util.Objects;
         ServletConfig.class,
         RootConfig.class,
         DBConfig.class,
-        SecurityConfig.class
+        SecurityConfig.class,
+        PushBatchConfig.class
     }
 )
 @PropertySource(
     {
         "file:src/main/resources/properties/*.properties",
         "file:src/main/resources/messages/*.properties",
-        "file:src/main/resources/logback-dev.xml"
+        "file:src/main/resources/logback-dev.xml",
+        "file:src/main/resources/mapper/*.xml"
     }
 )
 public class LoginLogoutIntegrationTest {
@@ -71,7 +74,7 @@ public class LoginLogoutIntegrationTest {
     @Autowired
     private MemberService memberService;
     private MockMvc mockMvc;
-    private MemberDTO memberDTO;
+    private Member member;
     private LoginDTO loginDTO;
 
     private URI getUri(String uri) {
@@ -92,13 +95,13 @@ public class LoginLogoutIntegrationTest {
                            .memberId("memberTest")
                            .passwd("test1234")
                            .build();
-        memberDTO = MemberDTO.builder()
-                             .memberId(loginDTO.getMemberId())
-                             .passwd(passwordEncoder.encode(loginDTO.getPasswd()))
-                             .nickname("멤버테스트")
-                             .tel("01012345678")
-                             .build();
-        memberService.saveMemberInfo(memberDTO);
+        member = Member.builder()
+                       .memberId(loginDTO.getMemberId())
+                       .passwd(passwordEncoder.encode(loginDTO.getPasswd()))
+                       .nickname("멤버테스트")
+                       .tel("01012345678")
+                       .build();
+        memberService.saveMemberInfo(member);
     }
 
     @Test
@@ -141,7 +144,7 @@ public class LoginLogoutIntegrationTest {
     @DisplayName("존재하지 않은 memberId이므로 로그인 실패")
     void when_memberId_not_existed_expected_bad_request() throws Exception {
         // given
-        loginDTO.setMemberId(memberDTO.getMemberId() + "test");
+        loginDTO.setMemberId(member.getMemberId() + "test");
         // when
         final ResultActions actions = mockMvc.perform(
             MockMvcRequestBuilders.post(getUri("/members/login"))
@@ -159,7 +162,7 @@ public class LoginLogoutIntegrationTest {
     @DisplayName("passwd 틀려서 로그인 실패")
     void when_wrong_passwd_expected_bad_request() throws Exception {
         // given
-        loginDTO.setPasswd(memberDTO.getPasswd() + "123444");
+        loginDTO.setPasswd(member.getPasswd() + "123444");
         // when
         final ResultActions actions = mockMvc.perform(
             MockMvcRequestBuilders.post(getUri("/members/login"))
@@ -188,7 +191,7 @@ public class LoginLogoutIntegrationTest {
         actions.andExpect(MockMvcResultMatchers.status().isOk())
                .andExpect(MockMvcResultMatchers.content().contentType(JSON_UTF_8))
                .andExpect(MockMvcResultMatchers.jsonPath(resultDataCodeKey)
-                                               .value(IsEqual.equalTo(memberDTO.getNickname())))
+                                               .value(IsEqual.equalTo(member.getNickname())))
                .andExpect(MockMvcResultMatchers.request().sessionAttribute(
                    "SPRING_SECURITY_CONTEXT",
                    Objects.requireNonNull(actions.andReturn().getRequest().getSession())

@@ -12,4 +12,4 @@ Spring, Spring security, Gradle, Mysql, Mybatis, JUnit 5, OpenJDK 17, Embedded T
 
 - [Create query](https://github.com/f-lab-edu/planB/wiki/%5B%ED%85%8C%EC%9D%B4%EB%B8%94%5D-Create-query)
 
-<img src="https://user-images.githubusercontent.com/15783027/156698483-713eff76-4719-4e9e-bd48-29cd65d51405.png">
+<img src="https://user-images.githubusercontent.com/15783027/159119003-db2d4369-32c9-4c0b-9c33-d88ce33d9dcf.png">

@@ -27,11 +27,8 @@ public class SecurityAuthenticationFailureHandler implements AuthenticationFailu
     ) throws IOException {
         responseWriter.setHeader(response, HttpStatus.BAD_REQUEST);
         response.getWriter()
-                .write(responseWriter.messageToString(ResponseMessage.builder()
-                                                                     .statusMessage(messageLookup.getMessage(
-                                                                         MessageSet.LOGIN_FAIL.getLookupKey()))
-                                                                     .data(Map.of("errorCode",
-                                                                                  MessageSet.LOGIN_FAIL.getCode()))
-                                                                     .build()));
+                .write(responseWriter.messageToString(
+                    new ResponseMessage(messageLookup.getMessage(MessageSet.LOGIN_FAIL.getLookupKey()),
+                                        Map.of("errorCode", MessageSet.LOGIN_FAIL.getCode()))));
     }
 }

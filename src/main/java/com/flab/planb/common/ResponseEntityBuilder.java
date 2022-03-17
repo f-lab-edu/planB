@@ -25,6 +25,10 @@ public class ResponseEntityBuilder {
         return get(httpStatus, messageSet, messageArg, null);
     }
 
+    public ResponseEntity<?> get(HttpStatus httpStatus, MessageSet messageSet, Map<String, ?> data) {
+        return get(httpStatus, messageSet, null, data);
+    }
+
     public ResponseEntity<?> get(HttpStatus httpStatus, MessageSet messageSet,
                                  String[] messageArg, Map<String, ?> data) {
         ResponseEntityParam param = create(messageSet, messageArg, data);
