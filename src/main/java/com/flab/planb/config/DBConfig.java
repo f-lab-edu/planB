@@ -1,5 +1,6 @@
 package com.flab.planb.config;
 
+import com.flab.planb.type.DayTypeHandler;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.RequiredArgsConstructor;
@@ -82,7 +83,9 @@ public class DBConfig {
         PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         sessionFactory.setConfigLocation(resolver.getResource("classpath:mybatis-config.xml"));
         sessionFactory.setMapperLocations(resolver.getResources("classpath:mapper/**/*.xml"));
+        sessionFactory.setConfigLocation(resolver.getResource("classpath:mybatis-config.xml"));
         sessionFactory.setDataSource(dataSource);
+        sessionFactory.setTypeHandlers(new DayTypeHandler());
         return sessionFactory.getObject();
     }
 
