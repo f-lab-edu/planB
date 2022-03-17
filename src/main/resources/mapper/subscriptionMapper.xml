@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flab.planb.service.mapper.SubscriptionMapper">
+  <select id="existsDuplicateSubscription" parameterType="subscriptionRequest" resultType="int">
+    select exists(
+             select id
+             from planb.tbl_subscription
+             where member_id = #{memberId}
+               and shop_id = #{shopId}
+               and subscription_day = #{subscriptionDay}
+               and subscription_time = #{subscriptionTime}
+             )
+  </select>
+  <select id="findPushList" parameterType="map" resultType="pushInfo">
+    select members.fcm_token,
+           subscription.member_id,
+           group_concat(business.name) as shop_name,
+           subscription.subscription_day,
+           subscription.subscription_time
+    from (
+           select member_id,
+                  shop_id,
+                  subscription_day,
+                  date_format(subscription_time, '%H:%i') as subscription_time
+           from planb.tbl_subscription
+           where subscription_day = #{subscriptionDay}
+             and subscription_time = #{subscriptionTime}
+           order by member_id
+             limit #{_skiprows}, #{_pagesize}
+         ) subscription
+           inner join planb.tbl_members members
+                      on subscription.member_id = members.id,
+         (select id, name from planb.tbl_business_info) business
+    where business.id = subscription.shop_id
+    group by subscription.member_id, subscription.subscription_day, subscription.subscription_time
+  </select>
+  <insert id="saveSubscription" parameterType="subscription" useGeneratedKeys="true" keyProperty="id">
+    insert into planb.tbl_subscription
+      (member_id, shop_id, address_id, subscription_day, subscription_time)
+    values (#{memberId}, #{shopId}, #{addressId}, #{subscriptionDay}, #{subscriptionTime})
+  </insert>
+  <insert id="saveSubscriptionMenus" parameterType="list">
+    insert into planb.tbl_subscription_menu
+    (subscription_id, menu_id)
+    values
+    <foreach collection="list" item="item" separator=",">
+      (#{item.subscriptionId}, #{item.menuId})
+    </foreach>
+  </insert>
+  <insert id="saveSubscriptionMenuOptions" parameterType="subscriptionMenu">
+    insert into planb.tbl_subscription_menu_option
+    (subscription_id, subscription_menu_id, menu_option_id)
+    values
+    <foreach collection="menuOptions" item="item" separator=",">
+      (#{subscriptionId}, #{menuId}, #{item})
+    </foreach>
+  </insert>
+</mapper>

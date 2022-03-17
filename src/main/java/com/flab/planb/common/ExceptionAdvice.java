@@ -1,14 +1,13 @@
 package com.flab.planb.common;
 
 import com.flab.planb.message.MessageSet;
-import com.flab.planb.message.ResponseMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 @RequiredArgsConstructor
@@ -16,24 +15,25 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 public class ExceptionAdvice {
 
-    private final MessageLookup messageLookup;
+    private final ResponseEntityBuilder responseEntityBuilder;
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> methodValidException(
-        MethodArgumentNotValidException exception,
-        HttpServletRequest request
-    ) {
-        log.error("유효성 검증 실패 URI : " + request.getRequestURI());
+    public ResponseEntity<?> methodValidException(MethodArgumentNotValidException exception,
+                                                  HttpServletRequest request) {
         exception.getBindingResult().getAllErrors()
-                 .forEach(error -> log.error(error.getDefaultMessage()));
+                 .forEach(error -> log.error(
+                     "MethodArgumentNotValidException URI : {} | message : {}",
+                     request.getRequestURI(), error.getDefaultMessage()));
 
-        return ResponseEntity.badRequest().body(
-            ResponseMessage.builder()
-                           .statusMessage(
-                               messageLookup.getMessage(MessageSet.VALID_FAIL.getLookupKey())
-                           ).data(Map.of("errorCode", MessageSet.VALID_FAIL.getCode()))
-                           .build()
-        );
+        return responseEntityBuilder.get(HttpStatus.BAD_REQUEST, MessageSet.VALID_FAIL);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<?> methodValidException(IllegalArgumentException exception,
+                                                  HttpServletRequest request) {
+        log.error("IllegalArgumentException URI : {} | message : {}", request.getRequestURI(), exception.getMessage());
+
+        return responseEntityBuilder.get(HttpStatus.BAD_REQUEST, MessageSet.VALID_FAIL);
     }
 
 }

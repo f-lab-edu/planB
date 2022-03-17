@@ -4,7 +4,8 @@ import ch.qos.logback.core.joran.spi.JoranException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flab.planb.common.MessageLookup;
 import com.flab.planb.common.ExceptionAdvice;
-import com.flab.planb.dto.member.MemberDTO;
+import com.flab.planb.common.ResponseEntityBuilder;
+import com.flab.planb.dto.member.Member;
 import com.flab.planb.service.MemberService;
 import java.io.FileNotFoundException;
 import org.hamcrest.core.IsEqual;
@@ -20,7 +21,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -42,20 +42,19 @@ public class MemberControllerUnitTest {
     );
     private static final ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
     private final MessageLookup messageLookup = Mockito.spy(new MessageLookup(messageSource));
+    private final ResponseEntityBuilder responseEntityBuilder = Mockito.spy(new ResponseEntityBuilder(messageLookup));
     private final String resultErrorCodeKey = "$.data.errorCode";
     private final String resultMessageKey = "$.statusMessage";
     private final String existenceValidCode = "VALID_FAIL_002";
     private final String argumentNotValidCode = "VALID_FAIL_001";
     @Mock
     private MemberService memberService;
-    @Mock
-    private PasswordEncoder passwordEncoder;
     @InjectMocks
     private MemberController memberController;
     @InjectMocks
     private ExceptionAdvice exceptionAdvice;
     private MockMvc mockMvc;
-    private MemberDTO memberDTO;
+    private Member member;
 
     private URI getUri(String uri) {
         return UriComponentsBuilder.fromUriString(uri).build().encode().toUri();
@@ -80,21 +79,21 @@ public class MemberControllerUnitTest {
                                          true
                                      )
                                  ).build();
-        memberDTO = MemberDTO.builder()
-                             .memberId("memberTest").nickname("멤버테스트")
-                             .passwd("test1234").tel("01012345678")
-                             .build();
+        member = Member.builder()
+                       .memberId("memberTest").nickname("멤버테스트")
+                       .passwd("test1234").tel("01012345678")
+                       .build();
     }
 
     @Test
     @DisplayName("사용 중인 MemberId 확인 - 사용 중으로 실패")
-    void when_memberId_is_existed_expected_bad_request() throws Exception {
+    void test_existence_memberId() throws Exception {
         // given
         Mockito.when(memberService.countByMemberId(ArgumentMatchers.anyString())).thenReturn(1);
         // when
         final ResultActions actions = mockMvc.perform(
             MockMvcRequestBuilders.get(
-                getUri("/members/member-id?check=" + memberDTO.getMemberId())
+                getUri("/members/member-id?check=" + member.getMemberId())
             ).contentType(JSON_UTF_8)
         ).andDo(MockMvcResultHandlers.print());
         // then
@@ -106,13 +105,13 @@ public class MemberControllerUnitTest {
 
     @Test
     @DisplayName("사용 중인 MemberId 확인 - 미사용으로 성공")
-    void when_memberId_is_not_existed_expected_ok() throws Exception {
+    void test_not_existence_memberId() throws Exception {
         // given
         Mockito.when(memberService.countByMemberId(ArgumentMatchers.anyString())).thenReturn(0);
         // when
         final ResultActions actions = mockMvc.perform(
             MockMvcRequestBuilders.get(
-                getUri("/members/member-id?check=" + memberDTO.getMemberId())
+                getUri("/members/member-id?check=" + member.getMemberId())
             ).contentType(JSON_UTF_8)
         ).andDo(MockMvcResultHandlers.print());
         // then
@@ -124,13 +123,13 @@ public class MemberControllerUnitTest {
 
     @Test
     @DisplayName("사용 중인 Nickname 확인 - 사용 중으로 실패")
-    void when_nickname_is_existed_expected_bad_request() throws Exception {
+    void test_existence_nickname() throws Exception {
         // given
         Mockito.when(memberService.countByNickName(ArgumentMatchers.anyString())).thenReturn(1);
         // when
         final ResultActions actions = mockMvc.perform(
             MockMvcRequestBuilders.get(
-                getUri("/members/nickname?check=" + memberDTO.getNickname())
+                getUri("/members/nickname?check=" + member.getNickname())
             ).contentType(JSON_UTF_8)
         ).andDo(MockMvcResultHandlers.print());
         // then
@@ -142,13 +141,13 @@ public class MemberControllerUnitTest {
 
     @Test
     @DisplayName("사용 중인 Nickname 확인 - 미사용으로 성공")
-    void when_nickname_is_not_existed_expected_ok() throws Exception {
+    void test_not_existence_nickname() throws Exception {
         // given
         Mockito.when(memberService.countByNickName(ArgumentMatchers.anyString())).thenReturn(0);
         // when
         final ResultActions actions = mockMvc.perform(
             MockMvcRequestBuilders.get(
-                getUri("/members/nickname?check=" + memberDTO.getNickname())
+                getUri("/members/nickname?check=" + member.getNickname())
             ).contentType(JSON_UTF_8)
         ).andDo(MockMvcResultHandlers.print());
         // then
@@ -159,80 +158,8 @@ public class MemberControllerUnitTest {
     }
 
     @Test
-    @DisplayName("memberId NotBlank 실패")
-    void when_memberid_is_blank_expected_bad_request() throws Exception {
-        // given
-        memberDTO.setMemberId("");
-        // when
-        final ResultActions actions = mockMvc.perform(
-            MockMvcRequestBuilders.post(getUri("/members"))
-                                  .contentType(JSON_UTF_8)
-                                  .content(new ObjectMapper().writeValueAsString(memberDTO))
-        ).andDo(MockMvcResultHandlers.print());
-        // then
-        actions.andExpect(MockMvcResultMatchers.status().isBadRequest())
-               .andExpect(MockMvcResultMatchers.content().contentType(JSON_UTF_8))
-               .andExpect(MockMvcResultMatchers.jsonPath(resultErrorCodeKey)
-                                               .value(IsEqual.equalTo(argumentNotValidCode)));
-    }
-
-    @Test
-    @DisplayName("passwd NotBlank 실패")
-    void when_passwwd_is_blank_expected_bad_request() throws Exception {
-        // given
-        memberDTO.setPasswd("");
-        // when
-        final ResultActions actions = mockMvc.perform(
-            MockMvcRequestBuilders.post(getUri("/members"))
-                                  .contentType(JSON_UTF_8)
-                                  .content(new ObjectMapper().writeValueAsString(memberDTO))
-        ).andDo(MockMvcResultHandlers.print());
-        // then
-        actions.andExpect(MockMvcResultMatchers.status().isBadRequest())
-               .andExpect(MockMvcResultMatchers.content().contentType(JSON_UTF_8))
-               .andExpect(MockMvcResultMatchers.jsonPath(resultErrorCodeKey)
-                                               .value(IsEqual.equalTo(argumentNotValidCode)));
-    }
-
-    @Test
-    @DisplayName("nickname NotBlank 실패")
-    void when_nickname_is_blank_expected_bad_request() throws Exception {
-        // given
-        memberDTO.setNickname("");
-        // when
-        final ResultActions actions = mockMvc.perform(
-            MockMvcRequestBuilders.post(getUri("/members"))
-                                  .contentType(JSON_UTF_8)
-                                  .content(new ObjectMapper().writeValueAsString(memberDTO))
-        ).andDo(MockMvcResultHandlers.print());
-        // then
-        actions.andExpect(MockMvcResultMatchers.status().isBadRequest())
-               .andExpect(MockMvcResultMatchers.content().contentType(JSON_UTF_8))
-               .andExpect(MockMvcResultMatchers.jsonPath(resultErrorCodeKey)
-                                               .value(IsEqual.equalTo(argumentNotValidCode)));
-    }
-
-    @Test
-    @DisplayName("tel NotBlank 실패")
-    void when_tel_is_blank_expected_bad_request() throws Exception {
-        // given
-        memberDTO.setTel("");
-        // when
-        final ResultActions actions = mockMvc.perform(
-            MockMvcRequestBuilders.post(getUri("/members"))
-                                  .contentType(JSON_UTF_8)
-                                  .content(new ObjectMapper().writeValueAsString(memberDTO))
-        ).andDo(MockMvcResultHandlers.print());
-        // then
-        actions.andExpect(MockMvcResultMatchers.status().isBadRequest())
-               .andExpect(MockMvcResultMatchers.content().contentType(JSON_UTF_8))
-               .andExpect(MockMvcResultMatchers.jsonPath(resultErrorCodeKey)
-                                               .value(IsEqual.equalTo(argumentNotValidCode)));
-    }
-
-    @Test
     @DisplayName("회원가입 실패")
-    void when_duplicated_signup_expected_bad_request() throws Exception {
+    void test_signup_failed() throws Exception {
         // given
         Mockito.when(memberService.countByMemberId(ArgumentMatchers.anyString())).thenReturn(1);
         Mockito.when(memberService.countByNickName(ArgumentMatchers.anyString())).thenReturn(1);
@@ -240,7 +167,7 @@ public class MemberControllerUnitTest {
         final ResultActions actions = mockMvc.perform(
             MockMvcRequestBuilders.post(getUri("/members"))
                                   .contentType(JSON_UTF_8)
-                                  .content(new ObjectMapper().writeValueAsString(memberDTO))
+                                  .content(new ObjectMapper().writeValueAsString(member))
         ).andDo(MockMvcResultHandlers.print());
         // then
         actions.andExpect(MockMvcResultMatchers.status().isBadRequest())
@@ -251,7 +178,7 @@ public class MemberControllerUnitTest {
 
     @Test
     @DisplayName("회원가입 성공")
-    void when_new_signup_expected_ok() throws Exception {
+    void test_signup_succeed() throws Exception {
         // given
         Mockito.when(memberService.countByMemberId(ArgumentMatchers.anyString())).thenReturn(0);
         Mockito.when(memberService.countByNickName(ArgumentMatchers.anyString())).thenReturn(0);
@@ -259,7 +186,7 @@ public class MemberControllerUnitTest {
         final ResultActions actions = mockMvc.perform(
             MockMvcRequestBuilders.post(getUri("/members"))
                                   .contentType(JSON_UTF_8)
-                                  .content(new ObjectMapper().writeValueAsString(memberDTO))
+                                  .content(new ObjectMapper().writeValueAsString(member))
         ).andDo(MockMvcResultHandlers.print());
         // then
         actions.andExpect(MockMvcResultMatchers.status().isOk())

@@ -9,13 +9,13 @@ import javax.validation.constraints.NotBlank;
 
 @NoArgsConstructor
 @Getter
-@Setter
 @ToString
-public class MemberDTO {
+public class Member {
 
     private long id;
     @NotBlank(message = "사용자 ID는 Null과 공백이 아닌 값이 들어가야 합니다.")
     private String memberId;
+    @Setter
     @NotBlank(message = "패스워드는 Null과 공백이 아닌 값이 들어가야 합니다.")
     private String passwd;
     @NotBlank(message = "닉네임은 Null과 공백이 아닌 값이 들어가야 합니다.")
@@ -25,8 +25,8 @@ public class MemberDTO {
     private String email;
 
     @Builder
-    public MemberDTO(long id, String memberId, String passwd,
-                     String nickname, String tel, String email) {
+    public Member(long id, String memberId, String passwd,
+                  String nickname, String tel, String email) {
         this.id = id;
         this.memberId = memberId;
         this.passwd = passwd;
