@@ -1,6 +1,6 @@
 package com.flab.planb.security;
 
-import com.flab.planb.service.MemberService;
+import com.flab.planb.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

@@ -7,7 +7,7 @@ import com.flab.planb.config.RootConfig;
 import com.flab.planb.config.SecurityConfig;
 import com.flab.planb.config.ServletConfig;
 import com.flab.planb.dto.member.Member;
-import com.flab.planb.service.MemberService;
+import com.flab.planb.service.member.MemberService;
 import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

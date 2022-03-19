@@ -1,7 +1,8 @@
 package com.flab.planb.service;
 
-import com.flab.planb.dto.member.AddressDTO;
-import com.flab.planb.service.mapper.AddressMapper;
+import com.flab.planb.dto.member.Address;
+import com.flab.planb.mapper.member.AddressMapper;
+import com.flab.planb.service.member.AddressService;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,11 +35,11 @@ public class AddressServiceTest {
     @DisplayName("주소 저장")
     void test_saveAddress() {
         // given
-        AddressDTO addressDTO = AddressDTO.builder().memberId(1L).address("서울특별시 종로구 종로 1").zipCode("03154").build();
+        Address address = Address.builder().memberId(1L).address("서울특별시 종로구 종로 1").zipCode("03154").build();
         // when
-        addressMapper.saveAddress(addressDTO);
+        addressMapper.saveAddress(address);
         // then
-        Mockito.verify(addressMapper).saveAddress(addressDTO);
+        Mockito.verify(addressMapper).saveAddress(address);
     }
 
     @Test
@@ -59,7 +60,7 @@ public class AddressServiceTest {
     void findByMemberId() {
         //given
         // when
-        List<AddressDTO> adress = addressMapper.findByMemberId(ArgumentMatchers.anyLong());
+        List<Address> adress = addressMapper.findByMemberId(ArgumentMatchers.anyLong());
         // then
         Mockito.verify(addressMapper).findByMemberId(ArgumentMatchers.anyLong());
     }
@@ -82,7 +83,7 @@ public class AddressServiceTest {
     void findByMemberIdAndId() {
         //given
         // when
-        AddressDTO adress = addressMapper.findByMemberIdAndId(ArgumentMatchers.anyMap());
+        Address adress = addressMapper.findByMemberIdAndId(ArgumentMatchers.anyMap());
         // then
         Mockito.verify(addressMapper).findByMemberIdAndId(ArgumentMatchers.anyMap());
     }

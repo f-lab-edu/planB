@@ -1,8 +1,9 @@
 package com.flab.planb.service;
 
-import com.flab.planb.dto.member.LoginDTO;
+import com.flab.planb.dto.member.Login;
 import com.flab.planb.dto.member.Member;
-import com.flab.planb.service.mapper.MemberMapper;
+import com.flab.planb.mapper.member.MemberMapper;
+import com.flab.planb.service.member.MemberService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -74,16 +75,14 @@ class MemberServiceUnitTest {
     @Test
     @DisplayName("MemberId로 회원정보 조회")
     void test_findByMemberId() throws Exception {
-        LoginDTO returnDTO = LoginDTO.builder()
-                                     .memberId("memberTest").passwd("test1234")
-                                     .build();
+        Login returnDTO = new Login("memberTest", "test1234");
         // given
         Mockito.when(memberMapper.findByMemberId(ArgumentMatchers.anyString()))
                .thenReturn(returnDTO);
         // when
-        LoginDTO loginDTO = memberService.findByMemberId(ArgumentMatchers.anyString());
+        Login login = memberService.findByMemberId(ArgumentMatchers.anyString());
         // then
-        Assertions.assertEquals(returnDTO, loginDTO);
+        Assertions.assertEquals(returnDTO, login);
     }
 
 }

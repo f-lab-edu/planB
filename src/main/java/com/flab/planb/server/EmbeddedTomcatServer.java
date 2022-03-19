@@ -2,7 +2,7 @@ package com.flab.planb.server;
 
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.ext.spring.LogbackConfigurer;
-import com.flab.planb.common.MessageLookup;
+import com.flab.planb.response.message.MessageLookup;
 import java.io.FileNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

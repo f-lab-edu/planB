@@ -2,7 +2,7 @@ package com.flab.planb.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.flab.planb.common.MessageLookup;
+import com.flab.planb.response.message.MessageLookup;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ComponentScan;

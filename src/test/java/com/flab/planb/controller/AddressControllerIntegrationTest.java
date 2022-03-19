@@ -6,9 +6,9 @@ import com.flab.planb.config.PushBatchConfig;
 import com.flab.planb.config.RootConfig;
 import com.flab.planb.config.SecurityConfig;
 import com.flab.planb.config.ServletConfig;
-import com.flab.planb.dto.member.AddressDTO;
+import com.flab.planb.dto.member.Address;
 import com.flab.planb.dto.member.request.AddressRequest;
-import com.flab.planb.service.AddressService;
+import com.flab.planb.service.member.AddressService;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -65,7 +65,7 @@ public class AddressControllerIntegrationTest {
     @Autowired
     private AddressService addressService;
     private MockMvc mockMvc;
-    private AddressDTO addressDTO;
+    private Address address;
 
     private URI getUri(String uri) {
         return UriComponentsBuilder.fromUriString(uri).build().encode().toUri();
@@ -76,15 +76,15 @@ public class AddressControllerIntegrationTest {
         mockMvc = MockMvcBuilders.webAppContextSetup(webContext)
                                  .addFilter(new CharacterEncodingFilter(StandardCharsets.UTF_8.toString(), true))
                                  .build();
-        addressDTO = AddressDTO.builder().memberId(1L).address("서울특별시 종로구 종로 1").zipCode("03154").build();
-        addressService.saveAddress(addressDTO);
+        address = Address.builder().memberId(1L).address("서울특별시 종로구 종로 1").zipCode("03154").build();
+        addressService.saveAddress(address);
     }
 
     @Test
     @DisplayName("memberId Positive 실패")
     void when_memberId_not_positive_expected_bad_request() throws Exception {
         // given
-        addressDTO = AddressDTO.builder().memberId(0L).address("서울특별시 종로구 종로 1").zipCode("03154").build();
+        address = Address.builder().memberId(0L).address("서울특별시 종로구 종로 1").zipCode("03154").build();
         // when
         final ResultActions actions = getResultActionsRequest(getPostBuilder());
         // then
@@ -95,7 +95,7 @@ public class AddressControllerIntegrationTest {
     @DisplayName("zipCode NotBlank 실패")
     void when_zipCode_is_blank_expected_bad_request() throws Exception {
         // given
-        addressDTO = AddressDTO.builder().memberId(1L).address("").zipCode("03154").build();
+        address = Address.builder().memberId(1L).address("").zipCode("03154").build();
         // when
         final ResultActions actions = getResultActionsRequest(getPostBuilder());
         // then
@@ -106,7 +106,7 @@ public class AddressControllerIntegrationTest {
     @DisplayName("zipCode 숫자가 아닌 값이 있어서 실패")
     void when_zipCode_contains_non_numeric_value_expected_bad_request() throws Exception {
         // given
-        addressDTO = AddressDTO.builder().memberId(1L).address("서울특별시 종로구 종로 1").zipCode("01b11").build();
+        address = Address.builder().memberId(1L).address("서울특별시 종로구 종로 1").zipCode("01b11").build();
         // when
         final ResultActions actions = getResultActionsRequest(getPostBuilder());
         // then
@@ -117,7 +117,7 @@ public class AddressControllerIntegrationTest {
     @DisplayName("zipCode 5자리 초과 실패")
     void when_zipCode_more_tan_five_digits_expected_bad_request() throws Exception {
         // given
-        addressDTO = AddressDTO.builder().memberId(1L).address("서울특별시 종로구 종로 1").zipCode("012345").build();
+        address = Address.builder().memberId(1L).address("서울특별시 종로구 종로 1").zipCode("012345").build();
         // when
         final ResultActions actions = getResultActionsRequest(getPostBuilder());
         // then
@@ -128,7 +128,7 @@ public class AddressControllerIntegrationTest {
     @DisplayName("address NotBlank 실패")
     void when_address_is_blank_expected_bad_request() throws Exception {
         // given
-        addressDTO = AddressDTO.builder().memberId(1L).address("").zipCode("03154").build();
+        address = Address.builder().memberId(1L).address("").zipCode("03154").build();
         // when
         final ResultActions actions = getResultActionsRequest(getPostBuilder());
         // then
@@ -139,7 +139,7 @@ public class AddressControllerIntegrationTest {
     @DisplayName("존재하지 않는 회원 ID 실패")
     void when_id_from_members_is_not_existed_expected_bad_request() throws Exception {
         // given
-        addressDTO = AddressDTO.builder().memberId(Long.MAX_VALUE).address("서울특별시 종로구 종로 1").zipCode("03154").build();
+        address = Address.builder().memberId(Long.MAX_VALUE).address("서울특별시 종로구 종로 1").zipCode("03154").build();
         // when
         final ResultActions actions = getResultActionsRequest(getPostBuilder());
         // then
@@ -161,7 +161,7 @@ public class AddressControllerIntegrationTest {
     void when_find_address_expected_ok() throws Exception {
         // given
         // when
-        final ResultActions actions = getResultActionsRequest(getGetBuilder("/" + addressDTO.getMemberId()));
+        final ResultActions actions = getResultActionsRequest(getGetBuilder("/" + address.getMemberId()));
         // then
         expectOk(actions, "조회에 성공하였습니다.");
         actions.andExpect(MockMvcResultMatchers.jsonPath("$.data.result").isNotEmpty());
@@ -172,9 +172,9 @@ public class AddressControllerIntegrationTest {
     @DisplayName("배달주소 단건 조회")
     void when_find_one_address_expected_ok() throws Exception {
         // given
-        long id = addressService.findByMemberId(addressDTO.getMemberId()).get(0).getId();
+        long id = addressService.findByMemberId(address.getMemberId()).get(0).getId();
         // when
-        ResultActions actions = getResultActionsRequest(getGetBuilder("/" + addressDTO.getMemberId() + "/" + id));
+        ResultActions actions = getResultActionsRequest(getGetBuilder("/" + address.getMemberId() + "/" + id));
         // then
         expectOk(actions, "조회에 성공하였습니다.");
         actions.andExpect(MockMvcResultMatchers.jsonPath("$.data.result").exists());
@@ -184,9 +184,9 @@ public class AddressControllerIntegrationTest {
     @DisplayName("배달주소 단건 삭제")
     void when_delete_one_address_expected_ok() throws Exception {
         // given
-        List<AddressDTO> address = addressService.findByMemberId(addressDTO.getMemberId());
+        List<Address> address = addressService.findByMemberId(this.address.getMemberId());
         // when
-        ResultActions actions = getResultActionsRequest(getDeleteBuilder("/" + addressDTO.getMemberId()
+        ResultActions actions = getResultActionsRequest(getDeleteBuilder("/" + this.address.getMemberId()
                                                                              + "/" + address.get(address.size() - 1)
                                                                                             .getId()));
         // then
@@ -197,11 +197,11 @@ public class AddressControllerIntegrationTest {
     @DisplayName("배달주소 단건 수정")
     void when_patch_one_address_expected_ok() throws Exception {
         // given
-        List<AddressDTO> address = addressService.findByMemberId(addressDTO.getMemberId());
+        List<Address> address = addressService.findByMemberId(this.address.getMemberId());
         AddressRequest aliasPatchRequest = AddressRequest.builder().alias("배달주소").build();
         // when
         ResultActions actions = getResultActionsRequest(
-            getPatchBuilder("/" + addressDTO.getMemberId() + "/" + address.get(address.size() - 1).getId()),
+            getPatchBuilder("/" + this.address.getMemberId() + "/" + address.get(address.size() - 1).getId()),
             aliasPatchRequest);
         // then
         expectPatchSucceed(actions, aliasPatchRequest, "alias");
@@ -210,7 +210,7 @@ public class AddressControllerIntegrationTest {
         AddressRequest addressPatchRequest = AddressRequest.builder().zipCode("01234").address("서울시 강남구 삼성동").build();
         // when
         actions = getResultActionsRequest(
-            getPatchBuilder("/" + addressDTO.getMemberId() + "/" + address.get(address.size() - 1).getId()),
+            getPatchBuilder("/" + this.address.getMemberId() + "/" + address.get(address.size() - 1).getId()),
             addressPatchRequest);
         // then
         expectPatchSucceed(actions, addressPatchRequest, "address");
@@ -223,7 +223,7 @@ public class AddressControllerIntegrationTest {
     }
 
     private void expectPatchedData(AddressRequest request, String check) {
-        List<AddressDTO> findAddress = addressService.findByMemberId(addressDTO.getMemberId());
+        List<Address> findAddress = addressService.findByMemberId(address.getMemberId());
         switch (check) {
             case "alias" -> {
                 Assertions.assertEquals(request.getAlias(), findAddress.get(findAddress.size() - 1).getAlias());
@@ -237,7 +237,7 @@ public class AddressControllerIntegrationTest {
 
     private ResultActions getResultActionsRequest(MockHttpServletRequestBuilder requestBuilder) throws Exception {
         return mockMvc.perform(requestBuilder.contentType(MediaType.APPLICATION_JSON_UTF8)
-                                             .content(objectMapper.writeValueAsString(addressDTO)))
+                                             .content(objectMapper.writeValueAsString(address)))
                       .andDo(MockMvcResultHandlers.print());
     }
 

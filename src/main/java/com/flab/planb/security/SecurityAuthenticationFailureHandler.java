@@ -1,9 +1,9 @@
 package com.flab.planb.security;
 
-import com.flab.planb.common.MessageLookup;
-import com.flab.planb.common.ResponseWriter;
-import com.flab.planb.message.MessageSet;
-import com.flab.planb.message.ResponseMessage;
+import com.flab.planb.response.message.MessageLookup;
+import com.flab.planb.response.ResponseWriter;
+import com.flab.planb.response.message.MessageSet;
+import com.flab.planb.response.message.ResponseMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;

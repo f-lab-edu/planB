@@ -1,6 +1,6 @@
 package com.flab.planb.config;
 
-import com.flab.planb.common.MessageLookup;
+import com.flab.planb.response.message.MessageLookup;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 import javax.servlet.Filter;

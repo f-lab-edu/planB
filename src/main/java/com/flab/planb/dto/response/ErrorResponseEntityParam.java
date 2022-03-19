@@ -1,7 +1,7 @@
 package com.flab.planb.dto.response;
 
-import com.flab.planb.message.MessageSet;
-import com.flab.planb.message.ResponseMessage;
+import com.flab.planb.response.message.MessageSet;
+import com.flab.planb.response.message.ResponseMessage;
 import lombok.ToString;
 import java.util.Map;
 
