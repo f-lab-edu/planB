@@ -1,6 +1,6 @@
 package com.flab.planb.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.flab.planb.TestUtils;
 import com.flab.planb.config.DBConfig;
 import com.flab.planb.config.PushBatchConfig;
 import com.flab.planb.config.RootConfig;
@@ -12,7 +12,6 @@ import com.flab.planb.service.member.AddressService;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import org.hamcrest.core.IsEqual;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -20,16 +19,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
@@ -58,7 +52,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 )
 public class AddressControllerIntegrationTest {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final String URI = "/address";
     private final String VALID_FAIL_001 = "VALID_FAIL_001";
     @Autowired
     private WebApplicationContext webContext;
@@ -86,9 +80,9 @@ public class AddressControllerIntegrationTest {
         // given
         address = Address.builder().memberId(0L).address("서울특별시 종로구 종로 1").zipCode("03154").build();
         // when
-        final ResultActions actions = getResultActionsRequest(getPostBuilder());
+        ResultActions actions = TestUtils.requestPost(mockMvc, URI, address);
         // then
-        expectBadRequest(actions, VALID_FAIL_001);
+        TestUtils.expectBadRequest(actions, VALID_FAIL_001);
     }
 
     @Test
@@ -97,9 +91,9 @@ public class AddressControllerIntegrationTest {
         // given
         address = Address.builder().memberId(1L).address("").zipCode("03154").build();
         // when
-        final ResultActions actions = getResultActionsRequest(getPostBuilder());
+        ResultActions actions = TestUtils.requestPost(mockMvc, URI, address);
         // then
-        expectBadRequest(actions, VALID_FAIL_001);
+        TestUtils.expectBadRequest(actions, VALID_FAIL_001);
     }
 
     @Test
@@ -108,9 +102,9 @@ public class AddressControllerIntegrationTest {
         // given
         address = Address.builder().memberId(1L).address("서울특별시 종로구 종로 1").zipCode("01b11").build();
         // when
-        final ResultActions actions = getResultActionsRequest(getPostBuilder());
+        ResultActions actions = TestUtils.requestPost(mockMvc, URI, address);
         // then
-        expectBadRequest(actions, VALID_FAIL_001);
+        TestUtils.expectBadRequest(actions, VALID_FAIL_001);
     }
 
     @Test
@@ -119,9 +113,9 @@ public class AddressControllerIntegrationTest {
         // given
         address = Address.builder().memberId(1L).address("서울특별시 종로구 종로 1").zipCode("012345").build();
         // when
-        final ResultActions actions = getResultActionsRequest(getPostBuilder());
+        ResultActions actions = TestUtils.requestPost(mockMvc, URI, address);
         // then
-        expectBadRequest(actions, VALID_FAIL_001);
+        TestUtils.expectBadRequest(actions, VALID_FAIL_001);
     }
 
     @Test
@@ -130,9 +124,9 @@ public class AddressControllerIntegrationTest {
         // given
         address = Address.builder().memberId(1L).address("").zipCode("03154").build();
         // when
-        final ResultActions actions = getResultActionsRequest(getPostBuilder());
+        ResultActions actions = TestUtils.requestPost(mockMvc, URI, address);
         // then
-        expectBadRequest(actions, VALID_FAIL_001);
+        TestUtils.expectBadRequest(actions, VALID_FAIL_001);
     }
 
     @Test
@@ -141,9 +135,9 @@ public class AddressControllerIntegrationTest {
         // given
         address = Address.builder().memberId(Long.MAX_VALUE).address("서울특별시 종로구 종로 1").zipCode("03154").build();
         // when
-        final ResultActions actions = getResultActionsRequest(getPostBuilder());
+        ResultActions actions = TestUtils.requestPost(mockMvc, URI, address);
         // then
-        expectBadRequest(actions, VALID_FAIL_001);
+        TestUtils.expectBadRequest(actions, VALID_FAIL_001);
     }
 
     @Test
@@ -151,9 +145,9 @@ public class AddressControllerIntegrationTest {
     void when_new_address_expected_ok() throws Exception {
         // given
         // when
-        final ResultActions actions = getResultActionsRequest(getPostBuilder());
+        ResultActions actions = TestUtils.requestPost(mockMvc, URI, address);
         // then
-        expectOk(actions, "등록하였습니다.");
+        TestUtils.expectOk(actions, "등록하였습니다.");
     }
 
     @Test
@@ -161,12 +155,11 @@ public class AddressControllerIntegrationTest {
     void when_find_address_expected_ok() throws Exception {
         // given
         // when
-        final ResultActions actions = getResultActionsRequest(getGetBuilder("/" + address.getMemberId()));
+        ResultActions actions = TestUtils.requestGet(mockMvc, URI + "/" + address.getMemberId(), null);
         // then
-        expectOk(actions, "조회에 성공하였습니다.");
-        actions.andExpect(MockMvcResultMatchers.jsonPath("$.data.result").isNotEmpty());
+        TestUtils.expectOk(actions, "조회에 성공하였습니다.");
+        TestUtils.expectNotEmpty(actions);
     }
-
 
     @Test
     @DisplayName("배달주소 단건 조회")
@@ -174,10 +167,10 @@ public class AddressControllerIntegrationTest {
         // given
         long id = addressService.findByMemberId(address.getMemberId()).get(0).getId();
         // when
-        ResultActions actions = getResultActionsRequest(getGetBuilder("/" + address.getMemberId() + "/" + id));
+        ResultActions actions = TestUtils.requestGet(mockMvc, URI + "/" + address.getMemberId() + "/" + id, null);
         // then
-        expectOk(actions, "조회에 성공하였습니다.");
-        actions.andExpect(MockMvcResultMatchers.jsonPath("$.data.result").exists());
+        TestUtils.expectOk(actions, "조회에 성공하였습니다.");
+        TestUtils.expectNotEmpty(actions);
     }
 
     @Test
@@ -186,11 +179,12 @@ public class AddressControllerIntegrationTest {
         // given
         List<Address> address = addressService.findByMemberId(this.address.getMemberId());
         // when
-        ResultActions actions = getResultActionsRequest(getDeleteBuilder("/" + this.address.getMemberId()
-                                                                             + "/" + address.get(address.size() - 1)
-                                                                                            .getId()));
+        ResultActions actions = TestUtils.requestDelete(mockMvc,
+                                                        URI + "/" + this.address.getMemberId()
+                                                            + "/" + address.get(address.size() - 1).getId(),
+                                                        null);
         // then
-        expectOk(actions, "삭제하였습니다.");
+        TestUtils.expectOk(actions, "삭제하였습니다.");
     }
 
     @Test
@@ -200,25 +194,27 @@ public class AddressControllerIntegrationTest {
         List<Address> address = addressService.findByMemberId(this.address.getMemberId());
         AddressRequest aliasPatchRequest = AddressRequest.builder().alias("배달주소").build();
         // when
-        ResultActions actions = getResultActionsRequest(
-            getPatchBuilder("/" + this.address.getMemberId() + "/" + address.get(address.size() - 1).getId()),
-            aliasPatchRequest);
+        ResultActions actions = TestUtils.requestPatch(mockMvc,
+                                                       URI + "/" + this.address.getMemberId()
+                                                           + "/" + address.get(address.size() - 1).getId(),
+                                                       aliasPatchRequest);
         // then
         expectPatchSucceed(actions, aliasPatchRequest, "alias");
 
         // given
         AddressRequest addressPatchRequest = AddressRequest.builder().zipCode("01234").address("서울시 강남구 삼성동").build();
         // when
-        actions = getResultActionsRequest(
-            getPatchBuilder("/" + this.address.getMemberId() + "/" + address.get(address.size() - 1).getId()),
-            addressPatchRequest);
+        actions = TestUtils.requestPatch(mockMvc,
+                                         URI + "/" + this.address.getMemberId()
+                                             + "/" + address.get(address.size() - 1).getId(),
+                                         addressPatchRequest);
         // then
         expectPatchSucceed(actions, addressPatchRequest, "address");
     }
 
     private void expectPatchSucceed(ResultActions actions, AddressRequest request, String check)
         throws Exception {
-        expectOk(actions, "수정하였습니다.");
+        TestUtils.expectOk(actions, "수정하였습니다.");
         expectPatchedData(request, check);
     }
 
@@ -233,47 +229,6 @@ public class AddressControllerIntegrationTest {
                 Assertions.assertEquals(request.getZipCode(), findAddress.get(findAddress.size() - 1).getZipCode());
             }
         }
-    }
-
-    private ResultActions getResultActionsRequest(MockHttpServletRequestBuilder requestBuilder) throws Exception {
-        return mockMvc.perform(requestBuilder.contentType(MediaType.APPLICATION_JSON_UTF8)
-                                             .content(objectMapper.writeValueAsString(address)))
-                      .andDo(MockMvcResultHandlers.print());
-    }
-
-    private ResultActions getResultActionsRequest(MockHttpServletRequestBuilder requestBuilder, Object object)
-        throws Exception {
-        return mockMvc.perform(requestBuilder.contentType(MediaType.APPLICATION_JSON_UTF8)
-                                             .content(objectMapper.writeValueAsString(object)))
-                      .andDo(MockMvcResultHandlers.print());
-    }
-
-    private MockHttpServletRequestBuilder getPostBuilder() {
-        return MockMvcRequestBuilders.post(getUri("/address"));
-    }
-
-    private MockHttpServletRequestBuilder getGetBuilder(String uri) {
-        return MockMvcRequestBuilders.get(getUri("/address" + uri));
-    }
-
-    private MockHttpServletRequestBuilder getDeleteBuilder(String uri) {
-        return MockMvcRequestBuilders.delete(getUri("/address" + uri));
-    }
-
-    private MockHttpServletRequestBuilder getPatchBuilder(String uri) {
-        return MockMvcRequestBuilders.patch(getUri("/address" + uri));
-    }
-
-    private void expectBadRequest(ResultActions actions, String errorCode) throws Exception {
-        actions.andExpect(MockMvcResultMatchers.status().isBadRequest())
-               .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8))
-               .andExpect(MockMvcResultMatchers.jsonPath("$.data.errorCode").value(IsEqual.equalTo(errorCode)));
-    }
-
-    private void expectOk(ResultActions actions, String statusMessage) throws Exception {
-        actions.andExpect(MockMvcResultMatchers.status().isOk())
-               .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8))
-               .andExpect(MockMvcResultMatchers.jsonPath("$.statusMessage").value(IsEqual.equalTo(statusMessage)));
     }
 
 }

@@ -2,6 +2,7 @@ package com.flab.planb.controller;
 
 import ch.qos.logback.core.joran.spi.JoranException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.flab.planb.TestUtils;
 import com.flab.planb.controller.member.MemberController;
 import com.flab.planb.response.message.MessageLookup;
 import com.flab.planb.exception.ExceptionAdvice;
@@ -36,16 +37,10 @@ import java.nio.charset.StandardCharsets;
 @PropertySource("file:src/main/resources/logback-dev.xml")
 public class MemberControllerUnitTest {
 
-    private static final MediaType JSON_UTF_8 = new MediaType(
-        MediaType.APPLICATION_JSON.getType(),
-        MediaType.APPLICATION_JSON.getSubtype(),
-        StandardCharsets.UTF_8
-    );
+    private final String URI = "/members";
     private static final ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
     private final MessageLookup messageLookup = Mockito.spy(new MessageLookup(messageSource));
     private final ResponseEntityBuilder responseEntityBuilder = Mockito.spy(new ResponseEntityBuilder(messageLookup));
-    private final String resultErrorCodeKey = "$.data.errorCode";
-    private final String resultMessageKey = "$.statusMessage";
     private final String existenceValidCode = "VALID_FAIL_002";
     private final String argumentNotValidCode = "VALID_FAIL_001";
     @Mock
@@ -72,17 +67,10 @@ public class MemberControllerUnitTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(memberController)
-                                 .setControllerAdvice(exceptionAdvice)
-                                 .addFilter(
-                                     new CharacterEncodingFilter(
-                                         StandardCharsets.UTF_8.toString(),
-                                         true
-                                     )
-                                 ).build();
-        member = Member.builder()
-                       .memberId("memberTest").nickname("멤버테스트")
-                       .passwd("test1234").tel("01012345678")
+        mockMvc = MockMvcBuilders.standaloneSetup(memberController).setControllerAdvice(exceptionAdvice)
+                                 .addFilter(new CharacterEncodingFilter(StandardCharsets.UTF_8.toString(), true))
+                                 .build();
+        member = Member.builder().memberId("memberTest").nickname("멤버테스트").passwd("test1234").tel("01012345678")
                        .build();
     }
 
@@ -92,16 +80,9 @@ public class MemberControllerUnitTest {
         // given
         Mockito.when(memberService.countByMemberId(ArgumentMatchers.anyString())).thenReturn(1);
         // when
-        final ResultActions actions = mockMvc.perform(
-            MockMvcRequestBuilders.get(
-                getUri("/members/member-id?check=" + member.getMemberId())
-            ).contentType(JSON_UTF_8)
-        ).andDo(MockMvcResultHandlers.print());
+        ResultActions actions = TestUtils.requestGet(mockMvc, URI + "/member-id?check=" + member.getMemberId(), null);
         // then
-        actions.andExpect(MockMvcResultMatchers.status().isBadRequest())
-               .andExpect(MockMvcResultMatchers.content().contentType(JSON_UTF_8))
-               .andExpect(MockMvcResultMatchers.jsonPath(resultErrorCodeKey)
-                                               .value(IsEqual.equalTo(existenceValidCode)));
+        TestUtils.expectBadRequest(actions, existenceValidCode);
     }
 
     @Test
@@ -110,16 +91,9 @@ public class MemberControllerUnitTest {
         // given
         Mockito.when(memberService.countByMemberId(ArgumentMatchers.anyString())).thenReturn(0);
         // when
-        final ResultActions actions = mockMvc.perform(
-            MockMvcRequestBuilders.get(
-                getUri("/members/member-id?check=" + member.getMemberId())
-            ).contentType(JSON_UTF_8)
-        ).andDo(MockMvcResultHandlers.print());
+        ResultActions actions = TestUtils.requestGet(mockMvc, URI + "/member-id?check=" + member.getMemberId(), null);
         // then
-        actions.andExpect(MockMvcResultMatchers.status().isOk())
-               .andExpect(MockMvcResultMatchers.content().contentType(JSON_UTF_8))
-               .andExpect(MockMvcResultMatchers.jsonPath(resultMessageKey)
-                                               .value(IsEqual.equalTo("인증에 성공하였습니다.")));
+        TestUtils.expectOk(actions, "인증에 성공하였습니다.");
     }
 
     @Test
@@ -128,16 +102,9 @@ public class MemberControllerUnitTest {
         // given
         Mockito.when(memberService.countByNickName(ArgumentMatchers.anyString())).thenReturn(1);
         // when
-        final ResultActions actions = mockMvc.perform(
-            MockMvcRequestBuilders.get(
-                getUri("/members/nickname?check=" + member.getNickname())
-            ).contentType(JSON_UTF_8)
-        ).andDo(MockMvcResultHandlers.print());
+        ResultActions actions = TestUtils.requestGet(mockMvc, URI + "/nickname?check=" + member.getNickname(), null);
         // then
-        actions.andExpect(MockMvcResultMatchers.status().isBadRequest())
-               .andExpect(MockMvcResultMatchers.content().contentType(JSON_UTF_8))
-               .andExpect(MockMvcResultMatchers.jsonPath(resultErrorCodeKey)
-                                               .value(IsEqual.equalTo(existenceValidCode)));
+        TestUtils.expectBadRequest(actions, existenceValidCode);
     }
 
     @Test
@@ -146,16 +113,9 @@ public class MemberControllerUnitTest {
         // given
         Mockito.when(memberService.countByNickName(ArgumentMatchers.anyString())).thenReturn(0);
         // when
-        final ResultActions actions = mockMvc.perform(
-            MockMvcRequestBuilders.get(
-                getUri("/members/nickname?check=" + member.getNickname())
-            ).contentType(JSON_UTF_8)
-        ).andDo(MockMvcResultHandlers.print());
+        ResultActions actions = TestUtils.requestGet(mockMvc, URI + "/nickname?check=" + member.getNickname(), null);
         // then
-        actions.andExpect(MockMvcResultMatchers.status().isOk())
-               .andExpect(MockMvcResultMatchers.content().contentType(JSON_UTF_8))
-               .andExpect(MockMvcResultMatchers.jsonPath(resultMessageKey)
-                                               .value(IsEqual.equalTo("인증에 성공하였습니다.")));
+        TestUtils.expectOk(actions, "인증에 성공하였습니다.");
     }
 
     @Test
@@ -165,16 +125,9 @@ public class MemberControllerUnitTest {
         Mockito.when(memberService.countByMemberId(ArgumentMatchers.anyString())).thenReturn(1);
         Mockito.when(memberService.countByNickName(ArgumentMatchers.anyString())).thenReturn(1);
         // when
-        final ResultActions actions = mockMvc.perform(
-            MockMvcRequestBuilders.post(getUri("/members"))
-                                  .contentType(JSON_UTF_8)
-                                  .content(new ObjectMapper().writeValueAsString(member))
-        ).andDo(MockMvcResultHandlers.print());
+        ResultActions actions = TestUtils.requestPost(mockMvc, URI, member);
         // then
-        actions.andExpect(MockMvcResultMatchers.status().isBadRequest())
-               .andExpect(MockMvcResultMatchers.content().contentType(JSON_UTF_8))
-               .andExpect(MockMvcResultMatchers.jsonPath(resultErrorCodeKey)
-                                               .value(IsEqual.equalTo("INSERT_FAIL_001")));
+        TestUtils.expectBadRequest(actions, "INSERT_FAIL_001");
     }
 
     @Test
@@ -184,16 +137,9 @@ public class MemberControllerUnitTest {
         Mockito.when(memberService.countByMemberId(ArgumentMatchers.anyString())).thenReturn(0);
         Mockito.when(memberService.countByNickName(ArgumentMatchers.anyString())).thenReturn(0);
         // when
-        final ResultActions actions = mockMvc.perform(
-            MockMvcRequestBuilders.post(getUri("/members"))
-                                  .contentType(JSON_UTF_8)
-                                  .content(new ObjectMapper().writeValueAsString(member))
-        ).andDo(MockMvcResultHandlers.print());
+        ResultActions actions = TestUtils.requestPost(mockMvc, URI, member);
         // then
-        actions.andExpect(MockMvcResultMatchers.status().isOk())
-               .andExpect(MockMvcResultMatchers.content().contentType(JSON_UTF_8))
-               .andExpect(MockMvcResultMatchers.jsonPath(resultMessageKey)
-                                               .value(IsEqual.equalTo("등록하였습니다.")));
+        TestUtils.expectOk(actions, "등록하였습니다.");
     }
 
 }
