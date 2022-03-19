@@ -6,7 +6,11 @@ planB는 커피 배달 구독 서비스입니다.<br/>
 
 # 사용 기술
 
-Spring, Spring security, Gradle, Mysql, Mybatis, JUnit 5, OpenJDK 17, Embedded Tomcat 9, AWS, Jenkins
+- OpenJDK 17, Embedded Tomcat 9, Gradle
+- Spring, Spring security, Spring batch
+- Mysql, Mybatis
+- ShedLock, FCM
+- JUnit 5, AWS, Jenkins
 
 # ER diagram
 
