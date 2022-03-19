@@ -41,9 +41,17 @@ public class TestUtils {
     }
 
     public static void expectOk(ResultActions actions, String statusMessage) throws Exception {
+        expectEqual(actions, "$.statusMessage", statusMessage);
+    }
+
+    public static void expectEqual(ResultActions actions, String path, String comparisonTarget) throws Exception {
         actions.andExpect(MockMvcResultMatchers.status().isOk())
                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8))
-               .andExpect(MockMvcResultMatchers.jsonPath("$.statusMessage").value(IsEqual.equalTo(statusMessage)));
+               .andExpect(MockMvcResultMatchers.jsonPath(path).value(IsEqual.equalTo(comparisonTarget)));
+    }
+
+    public static void expectNotEmpty(ResultActions actions) throws Exception {
+        actions.andExpect(MockMvcResultMatchers.jsonPath("$.data.result").isNotEmpty());
     }
 
     private static ResultActions getResultActionsRequest(MockMvc mockMvc, MockHttpServletRequestBuilder requestBuilder,
@@ -56,6 +64,5 @@ public class TestUtils {
     private static URI getUri(String uri) {
         return UriComponentsBuilder.fromUriString(uri).build().encode().toUri();
     }
-
 
 }

@@ -1,6 +1,6 @@
 package com.flab.planb.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.flab.planb.TestUtils;
 import com.flab.planb.controller.member.AddressController;
 import com.flab.planb.exception.ExceptionAdvice;
 import com.flab.planb.response.message.MessageLookup;
@@ -10,7 +10,6 @@ import com.flab.planb.dto.member.request.AddressRequest;
 import com.flab.planb.service.member.AddressService;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import org.hamcrest.core.IsEqual;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,12 +22,8 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.filter.CharacterEncodingFilter;
@@ -37,7 +32,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @PropertySource("file:src/main/resources/logback-dev.xml")
 public class AddressControllerUnitTest {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final String URI = "/address";
     private static final ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
     private final MessageLookup messageLookup = Mockito.spy(new MessageLookup(messageSource));
     private final ResponseEntityBuilder responseEntityBuilder = Mockito.spy(new ResponseEntityBuilder(messageLookup));
@@ -78,9 +73,9 @@ public class AddressControllerUnitTest {
         // given
         Mockito.when(addressService.existById(ArgumentMatchers.anyLong())).thenReturn(0);
         // when
-        ResultActions actions = getResultActionsRequest(getPostBuilder());
+        ResultActions actions = TestUtils.requestPost(mockMvc, URI, address);
         // then
-        expectBadRequest(actions, "VALID_FAIL_001");
+        TestUtils.expectBadRequest(actions, "VALID_FAIL_001");
     }
 
     @Test
@@ -89,9 +84,9 @@ public class AddressControllerUnitTest {
         // given
         Mockito.when(addressService.existById(ArgumentMatchers.anyLong())).thenReturn(1);
         // when
-        ResultActions actions = getResultActionsRequest(getPostBuilder());
+        ResultActions actions = TestUtils.requestPost(mockMvc, URI, address);
         // then
-        expectOk(actions, "등록하였습니다.");
+        TestUtils.expectOk(actions, "등록하였습니다.");
     }
 
     @Test
@@ -101,10 +96,10 @@ public class AddressControllerUnitTest {
         Mockito.when(addressService.existById(ArgumentMatchers.anyLong())).thenReturn(1);
         Mockito.when(addressService.findByMemberId(ArgumentMatchers.anyLong())).thenReturn(ArgumentMatchers.anyList());
         // when
-        ResultActions actions = getResultActionsRequest(getGetBuilder("/" + address.getMemberId()));
+        ResultActions actions = TestUtils.requestGet(mockMvc, URI + "/" + address.getMemberId(), null);
         // then
-        expectOk(actions, "조회에 성공하였습니다.");
-        actions.andExpect(MockMvcResultMatchers.jsonPath("$.data.result").exists());
+        TestUtils.expectOk(actions, "조회에 성공하였습니다.");
+        TestUtils.expectNotEmpty(actions);
     }
 
     @Test
@@ -114,9 +109,9 @@ public class AddressControllerUnitTest {
         Mockito.when(addressService.existByMemberIdAndId(ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong()))
                .thenReturn(0);
         // when
-        ResultActions actions = getResultActionsRequest(getPostBuilder());
+        ResultActions actions = TestUtils.requestPost(mockMvc, URI, address);
         // then
-        expectBadRequest(actions, "VALID_FAIL_001");
+        TestUtils.expectBadRequest(actions, "VALID_FAIL_001");
     }
 
 
@@ -130,11 +125,12 @@ public class AddressControllerUnitTest {
         Mockito.when(addressService.findByMemberIdAndId(ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong()))
                .thenReturn(address);
         // when
-        ResultActions actions = getResultActionsRequest(getGetBuilder("/" + address.getMemberId()
-                                                                          + "/" + address.getId()));
+        ResultActions actions = TestUtils.requestGet(mockMvc,
+                                                     URI + "/" + address.getMemberId() + "/" + address.getId(),
+                                                     null);
         // then
-        expectOk(actions, "조회에 성공하였습니다.");
-        actions.andExpect(MockMvcResultMatchers.jsonPath("$.data.result").exists());
+        TestUtils.expectOk(actions, "조회에 성공하였습니다.");
+        TestUtils.expectNotEmpty(actions);
     }
 
     @Test
@@ -145,10 +141,11 @@ public class AddressControllerUnitTest {
         Mockito.when(addressService.existByMemberIdAndId(ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong()))
                .thenReturn(1);
         // when
-        ResultActions actions = getResultActionsRequest(getDeleteBuilder("/" + address.getMemberId()
-                                                                             + "/" + address.getId()));
+        ResultActions actions = TestUtils.requestDelete(mockMvc,
+                                                        URI + "/" + address.getMemberId() + "/" + address.getId(),
+                                                        null);
         // then
-        expectOk(actions, "삭제하였습니다.");
+        TestUtils.expectOk(actions, "삭제하였습니다.");
     }
 
     @Test
@@ -159,10 +156,11 @@ public class AddressControllerUnitTest {
         Mockito.when(addressService.existByMemberIdAndId(ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong()))
                .thenReturn(1);
         // when
-        ResultActions actions = getResultActionsRequest(getPatchBuilder("/" + address.getMemberId()
-                                                                            + "/" + address.getId()));
+        ResultActions actions = TestUtils.requestPatch(mockMvc,
+                                                       URI + "/" + address.getMemberId() + "/" + address.getId(),
+                                                       address);
         // then
-        expectOk(actions, "수정하였습니다.");
+        TestUtils.expectOk(actions, "수정하였습니다.");
     }
 
     @Test
@@ -189,40 +187,6 @@ public class AddressControllerUnitTest {
         } catch (IllegalArgumentException e) {
             Assertions.assertEquals("AddressRequestBuilder is not valid", e.getMessage());
         }
-    }
-
-    private ResultActions getResultActionsRequest(MockHttpServletRequestBuilder requestBuilder) throws Exception {
-        return mockMvc.perform(requestBuilder.contentType(MediaType.APPLICATION_JSON_UTF8)
-                                             .content(objectMapper.writeValueAsString(address)))
-                      .andDo(MockMvcResultHandlers.print());
-    }
-
-    private MockHttpServletRequestBuilder getPostBuilder() {
-        return MockMvcRequestBuilders.post(getUri("/address"));
-    }
-
-    private MockHttpServletRequestBuilder getGetBuilder(String uri) {
-        return MockMvcRequestBuilders.get(getUri("/address" + uri));
-    }
-
-    private MockHttpServletRequestBuilder getDeleteBuilder(String uri) {
-        return MockMvcRequestBuilders.delete(getUri("/address" + uri));
-    }
-
-    private MockHttpServletRequestBuilder getPatchBuilder(String uri) {
-        return MockMvcRequestBuilders.patch(getUri("/address" + uri));
-    }
-
-    private void expectBadRequest(ResultActions actions, String errorCode) throws Exception {
-        actions.andExpect(MockMvcResultMatchers.status().isBadRequest())
-               .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8))
-               .andExpect(MockMvcResultMatchers.jsonPath("$.data.errorCode").value(IsEqual.equalTo(errorCode)));
-    }
-
-    private void expectOk(ResultActions actions, String statusMessage) throws Exception {
-        actions.andExpect(MockMvcResultMatchers.status().isOk())
-               .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8))
-               .andExpect(MockMvcResultMatchers.jsonPath("$.statusMessage").value(IsEqual.equalTo(statusMessage)));
     }
 
 }
