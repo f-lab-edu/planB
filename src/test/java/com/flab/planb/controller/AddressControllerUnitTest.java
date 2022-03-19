@@ -1,12 +1,13 @@
 package com.flab.planb.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.flab.planb.common.ExceptionAdvice;
-import com.flab.planb.common.MessageLookup;
-import com.flab.planb.common.ResponseEntityBuilder;
-import com.flab.planb.dto.member.AddressDTO;
+import com.flab.planb.controller.member.AddressController;
+import com.flab.planb.exception.ExceptionAdvice;
+import com.flab.planb.response.message.MessageLookup;
+import com.flab.planb.response.ResponseEntityBuilder;
+import com.flab.planb.dto.member.Address;
 import com.flab.planb.dto.member.request.AddressRequest;
-import com.flab.planb.service.AddressService;
+import com.flab.planb.service.member.AddressService;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import org.hamcrest.core.IsEqual;
@@ -15,7 +16,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -48,7 +48,7 @@ public class AddressControllerUnitTest {
     @InjectMocks
     private ExceptionAdvice exceptionAdvice;
     private MockMvc mockMvc;
-    private AddressDTO addressDTO;
+    private Address address;
 
     private URI getUri(String uri) {
         return UriComponentsBuilder.fromUriString(uri).build().encode().toUri();
@@ -69,7 +69,7 @@ public class AddressControllerUnitTest {
                                  .addFilter(new CharacterEncodingFilter(StandardCharsets.UTF_8.toString(), true))
                                  .build();
 
-        addressDTO = AddressDTO.builder().memberId(1L).address("서울특별시 종로구 종로 1").zipCode("03154").build();
+        address = Address.builder().memberId(1L).address("서울특별시 종로구 종로 1").zipCode("03154").build();
     }
 
     @Test
@@ -101,7 +101,7 @@ public class AddressControllerUnitTest {
         Mockito.when(addressService.existById(ArgumentMatchers.anyLong())).thenReturn(1);
         Mockito.when(addressService.findByMemberId(ArgumentMatchers.anyLong())).thenReturn(ArgumentMatchers.anyList());
         // when
-        ResultActions actions = getResultActionsRequest(getGetBuilder("/" + addressDTO.getMemberId()));
+        ResultActions actions = getResultActionsRequest(getGetBuilder("/" + address.getMemberId()));
         // then
         expectOk(actions, "조회에 성공하였습니다.");
         actions.andExpect(MockMvcResultMatchers.jsonPath("$.data.result").exists());
@@ -128,10 +128,10 @@ public class AddressControllerUnitTest {
         Mockito.when(addressService.existByMemberIdAndId(ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong()))
                .thenReturn(1);
         Mockito.when(addressService.findByMemberIdAndId(ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong()))
-               .thenReturn(addressDTO);
+               .thenReturn(address);
         // when
-        ResultActions actions = getResultActionsRequest(getGetBuilder("/" + addressDTO.getMemberId()
-                                                                          + "/" + addressDTO.getId()));
+        ResultActions actions = getResultActionsRequest(getGetBuilder("/" + address.getMemberId()
+                                                                          + "/" + address.getId()));
         // then
         expectOk(actions, "조회에 성공하였습니다.");
         actions.andExpect(MockMvcResultMatchers.jsonPath("$.data.result").exists());
@@ -145,8 +145,8 @@ public class AddressControllerUnitTest {
         Mockito.when(addressService.existByMemberIdAndId(ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong()))
                .thenReturn(1);
         // when
-        ResultActions actions = getResultActionsRequest(getDeleteBuilder("/" + addressDTO.getMemberId()
-                                                                             + "/" + addressDTO.getId()));
+        ResultActions actions = getResultActionsRequest(getDeleteBuilder("/" + address.getMemberId()
+                                                                             + "/" + address.getId()));
         // then
         expectOk(actions, "삭제하였습니다.");
     }
@@ -159,8 +159,8 @@ public class AddressControllerUnitTest {
         Mockito.when(addressService.existByMemberIdAndId(ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong()))
                .thenReturn(1);
         // when
-        ResultActions actions = getResultActionsRequest(getPatchBuilder("/" + addressDTO.getMemberId()
-                                                                            + "/" + addressDTO.getId()));
+        ResultActions actions = getResultActionsRequest(getPatchBuilder("/" + address.getMemberId()
+                                                                            + "/" + address.getId()));
         // then
         expectOk(actions, "수정하였습니다.");
     }
@@ -193,7 +193,7 @@ public class AddressControllerUnitTest {
 
     private ResultActions getResultActionsRequest(MockHttpServletRequestBuilder requestBuilder) throws Exception {
         return mockMvc.perform(requestBuilder.contentType(MediaType.APPLICATION_JSON_UTF8)
-                                             .content(objectMapper.writeValueAsString(addressDTO)))
+                                             .content(objectMapper.writeValueAsString(address)))
                       .andDo(MockMvcResultHandlers.print());
     }
 

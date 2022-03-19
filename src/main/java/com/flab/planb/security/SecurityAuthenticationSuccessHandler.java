@@ -1,9 +1,8 @@
 package com.flab.planb.security;
 
-import com.flab.planb.common.ResponseWriter;
-import com.flab.planb.dto.member.LoginDTO;
-import com.flab.planb.message.MessageSet;
-import com.flab.planb.message.ResponseMessage;
+import com.flab.planb.response.ResponseWriter;
+import com.flab.planb.dto.member.Login;
+import com.flab.planb.response.message.ResponseMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -27,7 +26,7 @@ public class SecurityAuthenticationSuccessHandler implements AuthenticationSucce
         responseWriter.setHeader(response, HttpStatus.OK);
         response.getWriter()
                 .write(responseWriter.messageToString(
-                    new ResponseMessage(Map.of("nickname", ((LoginDTO) authentication.getPrincipal()).getNickname()))));
+                    new ResponseMessage(Map.of("nickname", ((Login) authentication.getPrincipal()).getNickname()))));
 
     }
 

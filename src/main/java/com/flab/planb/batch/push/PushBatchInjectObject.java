@@ -1,6 +1,7 @@
 package com.flab.planb.batch.push;
 
-import com.flab.planb.common.MessageLookup;
+import com.flab.planb.batch.ThreadPoolTaskExecutorCreator;
+import com.flab.planb.response.message.MessageLookup;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.session.SqlSessionFactory;

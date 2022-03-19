@@ -6,9 +6,9 @@ import com.flab.planb.config.PushBatchConfig;
 import com.flab.planb.config.RootConfig;
 import com.flab.planb.config.SecurityConfig;
 import com.flab.planb.config.ServletConfig;
-import com.flab.planb.dto.member.LoginDTO;
+import com.flab.planb.dto.member.Login;
 import com.flab.planb.dto.member.Member;
-import com.flab.planb.service.MemberService;
+import com.flab.planb.service.member.MemberService;
 import org.hamcrest.core.IsEqual;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -75,7 +75,7 @@ public class LoginLogoutIntegrationTest {
     private MemberService memberService;
     private MockMvc mockMvc;
     private Member member;
-    private LoginDTO loginDTO;
+    private Login login;
 
     private URI getUri(String uri) {
         return UriComponentsBuilder.fromUriString(uri).build().encode().toUri();
@@ -91,13 +91,10 @@ public class LoginLogoutIntegrationTest {
                                  )
                                  .apply(SecurityMockMvcConfigurers.springSecurity())
                                  .build();
-        loginDTO = LoginDTO.builder()
-                           .memberId("memberTest")
-                           .passwd("test1234")
-                           .build();
+        login = new Login("memberTest", "test1234");
         member = Member.builder()
-                       .memberId(loginDTO.getMemberId())
-                       .passwd(passwordEncoder.encode(loginDTO.getPasswd()))
+                       .memberId(login.getMemberId())
+                       .passwd(passwordEncoder.encode(login.getPasswd()))
                        .nickname("멤버테스트")
                        .tel("01012345678")
                        .build();
@@ -108,12 +105,12 @@ public class LoginLogoutIntegrationTest {
     @DisplayName("memberId NotEmpty 실패")
     void when_memberid_is_empty_expected_bad_request() throws Exception {
         // given
-        loginDTO.setMemberId("");
+        login = new Login("", "test1234");
         // when
         final ResultActions actions = mockMvc.perform(
             MockMvcRequestBuilders.post(getUri("/members/login"))
                                   .contentType(JSON_UTF_8)
-                                  .content(new ObjectMapper().writeValueAsString(loginDTO))
+                                  .content(new ObjectMapper().writeValueAsString(login))
         ).andDo(MockMvcResultHandlers.print());
         // then
         actions.andExpect(MockMvcResultMatchers.status().isBadRequest())
@@ -126,12 +123,12 @@ public class LoginLogoutIntegrationTest {
     @DisplayName("passwd NotEmpty 실패")
     void when_passwd_is_empty_expected_bad_request() throws Exception {
         // given
-        loginDTO.setPasswd("");
+        login = new Login("memberTest", "");
         // when
         final ResultActions actions = mockMvc.perform(
             MockMvcRequestBuilders.post(getUri("/members/login"))
                                   .contentType(JSON_UTF_8)
-                                  .content(new ObjectMapper().writeValueAsString(loginDTO))
+                                  .content(new ObjectMapper().writeValueAsString(login))
         ).andDo(MockMvcResultHandlers.print());
         // then
         actions.andExpect(MockMvcResultMatchers.status().isBadRequest())
@@ -144,12 +141,12 @@ public class LoginLogoutIntegrationTest {
     @DisplayName("존재하지 않은 memberId이므로 로그인 실패")
     void when_memberId_not_existed_expected_bad_request() throws Exception {
         // given
-        loginDTO.setMemberId(member.getMemberId() + "test");
+        login = new Login("memberTesttest", "test1234");
         // when
         final ResultActions actions = mockMvc.perform(
             MockMvcRequestBuilders.post(getUri("/members/login"))
                                   .contentType(JSON_UTF_8)
-                                  .content(new ObjectMapper().writeValueAsString(loginDTO))
+                                  .content(new ObjectMapper().writeValueAsString(login))
         ).andDo(MockMvcResultHandlers.print());
         // then
         actions.andExpect(MockMvcResultMatchers.status().isBadRequest())
@@ -162,12 +159,12 @@ public class LoginLogoutIntegrationTest {
     @DisplayName("passwd 틀려서 로그인 실패")
     void when_wrong_passwd_expected_bad_request() throws Exception {
         // given
-        loginDTO.setPasswd(member.getPasswd() + "123444");
+        login = new Login("memberTest", "test1234123444");
         // when
         final ResultActions actions = mockMvc.perform(
             MockMvcRequestBuilders.post(getUri("/members/login"))
                                   .contentType(JSON_UTF_8)
-                                  .content(new ObjectMapper().writeValueAsString(loginDTO))
+                                  .content(new ObjectMapper().writeValueAsString(login))
         ).andDo(MockMvcResultHandlers.print());
         // then
         actions.andExpect(MockMvcResultMatchers.status().isBadRequest())
@@ -185,7 +182,7 @@ public class LoginLogoutIntegrationTest {
         final ResultActions actions = mockMvc.perform(
             MockMvcRequestBuilders.post(getUri("/members/login"))
                                   .contentType(JSON_UTF_8)
-                                  .content(new ObjectMapper().writeValueAsString(loginDTO))
+                                  .content(new ObjectMapper().writeValueAsString(login))
         ).andDo(MockMvcResultHandlers.print());
         // then
         actions.andExpect(MockMvcResultMatchers.status().isOk())
@@ -207,7 +204,7 @@ public class LoginLogoutIntegrationTest {
         mockMvc.perform(
             MockMvcRequestBuilders.post(getUri("/members/login"))
                                   .contentType(JSON_UTF_8)
-                                  .content(new ObjectMapper().writeValueAsString(loginDTO))
+                                  .content(new ObjectMapper().writeValueAsString(login))
         ).andDo(MockMvcResultHandlers.print());
         // when
         final ResultActions logoutActions = mockMvc.perform(

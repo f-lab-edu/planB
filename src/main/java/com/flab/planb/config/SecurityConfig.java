@@ -1,9 +1,9 @@
 package com.flab.planb.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.flab.planb.common.MessageLookup;
-import com.flab.planb.common.ResponseWriter;
-import com.flab.planb.filter.FilterChainExceptionFilter;
+import com.flab.planb.response.message.MessageLookup;
+import com.flab.planb.response.ResponseWriter;
+import com.flab.planb.security.filter.FilterChainExceptionFilter;
 import com.flab.planb.security.SecurityAccessDeniedHandler;
 import com.flab.planb.security.SecurityAuthenticationEntryPoint;
 import com.flab.planb.security.SecurityAuthenticationFailureHandler;

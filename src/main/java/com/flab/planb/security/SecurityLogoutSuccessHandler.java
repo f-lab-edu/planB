@@ -1,6 +1,6 @@
 package com.flab.planb.security;
 
-import com.flab.planb.common.ResponseWriter;
+import com.flab.planb.response.ResponseWriter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;

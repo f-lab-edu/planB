@@ -25,7 +25,7 @@ import javax.sql.DataSource;
 @Configuration
 @EnableTransactionManagement
 @PropertySource({"classpath:properties/datasource.properties"})
-@MapperScan(basePackages = {"com.flab.planb.service.mapper"})
+@MapperScan(basePackages = {"com.flab.planb.mapper"})
 public class DBConfig {
 
     @Value("${spring.datasource.driver-class-name}")

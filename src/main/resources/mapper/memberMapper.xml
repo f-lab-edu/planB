@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.flab.planb.service.mapper.MemberMapper">
+<mapper namespace="com.flab.planb.mapper.member.MemberMapper">
   <!-- 사용자 기본 회원정보 추가 -->
   <insert id="saveMemberInfo" parameterType="com.flab.planb.dto.member.Member">
     insert into planb.tbl_members

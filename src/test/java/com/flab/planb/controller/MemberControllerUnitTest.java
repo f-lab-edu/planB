@@ -2,11 +2,12 @@ package com.flab.planb.controller;
 
 import ch.qos.logback.core.joran.spi.JoranException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.flab.planb.common.MessageLookup;
-import com.flab.planb.common.ExceptionAdvice;
-import com.flab.planb.common.ResponseEntityBuilder;
+import com.flab.planb.controller.member.MemberController;
+import com.flab.planb.response.message.MessageLookup;
+import com.flab.planb.exception.ExceptionAdvice;
+import com.flab.planb.response.ResponseEntityBuilder;
 import com.flab.planb.dto.member.Member;
-import com.flab.planb.service.MemberService;
+import com.flab.planb.service.member.MemberService;
 import java.io.FileNotFoundException;
 import org.hamcrest.core.IsEqual;
 import org.junit.jupiter.api.BeforeAll;

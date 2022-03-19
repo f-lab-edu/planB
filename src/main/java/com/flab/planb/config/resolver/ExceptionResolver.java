@@ -1,8 +1,8 @@
 package com.flab.planb.config.resolver;
 
-import com.flab.planb.common.MessageLookup;
-import com.flab.planb.common.ResponseWriter;
-import com.flab.planb.message.MessageSenderStrategyGroup;
+import com.flab.planb.response.message.MessageLookup;
+import com.flab.planb.response.ResponseWriter;
+import com.flab.planb.response.message.MessageSenderStrategyGroup;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

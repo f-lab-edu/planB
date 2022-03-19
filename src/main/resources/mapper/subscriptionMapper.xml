@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.flab.planb.service.mapper.SubscriptionMapper">
+<mapper namespace="com.flab.planb.mapper.subscription.SubscriptionMapper">
   <select id="existsDuplicateSubscription" parameterType="subscriptionRequest" resultType="int">
     select exists(
              select id

@@ -1,7 +1,7 @@
 package com.flab.planb.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.flab.planb.dto.member.LoginDTO;
+import com.flab.planb.dto.member.Login;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,17 +31,17 @@ public class SecurityAuthenticationFilter extends AbstractAuthenticationProcessi
         HttpServletRequest request,
         HttpServletResponse response
     ) throws AuthenticationException, IOException {
-        LoginDTO loginDTO = objectMapper.readValue(request.getReader(), LoginDTO.class);
-        log.debug("memberId {}, passwd {}", loginDTO.getMemberId(), loginDTO.getPasswd());
-        if (StringUtils.isEmpty(loginDTO.getMemberId())
-            || StringUtils.isEmpty(loginDTO.getPasswd())) {
+        Login login = objectMapper.readValue(request.getReader(), Login.class);
+        log.debug("memberId {}, passwd {}", login.getMemberId(), login.getPasswd());
+        if (StringUtils.isEmpty(login.getMemberId())
+            || StringUtils.isEmpty(login.getPasswd())) {
             throw new IllegalArgumentException("memberId or Password is empty");
         }
 
         return getAuthenticationManager().authenticate(
             new UsernamePasswordAuthenticationToken(
-                loginDTO.getMemberId(),
-                loginDTO.getPasswd()
+                login.getMemberId(),
+                login.getPasswd()
             )
         );
     }
