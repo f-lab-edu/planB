@@ -33,33 +33,30 @@ class MemberServiceUnitTest {
 
     @Test
     @DisplayName("MemberId 개수 확인")
-    void test_countByMemberId() throws Exception {
-        int checkCouunt = 1;
+    void test_countByMemberId() {
         // given
-        Mockito.when(memberMapper.countByMemberId(ArgumentMatchers.anyString()))
-               .thenReturn(checkCouunt);
+        Mockito.when(memberMapper.countByMemberId(ArgumentMatchers.anyString())).thenReturn(1);
         // when
-        int memberIdCount = memberService.countByMemberId(ArgumentMatchers.anyString());
+        boolean isNotUsedMemberId = memberService.isNotUsedMemberId(ArgumentMatchers.anyString());
         // then
-        Assertions.assertEquals(checkCouunt, memberIdCount);
+        Assertions.assertFalse(isNotUsedMemberId);
     }
 
     @Test
     @DisplayName("Nickname 개수 확인")
-    void test_countByNickName() throws Exception {
-        int checkCouunt = 1;
+    void test_countByNickName() {
         // given
         Mockito.when(memberMapper.countByNickName(ArgumentMatchers.anyString()))
-               .thenReturn(checkCouunt);
+               .thenReturn(1);
         // when
-        int nickNameCount = memberService.countByNickName(ArgumentMatchers.anyString());
+        boolean isNotUsedNicname = memberService.isNotUsedNicname(ArgumentMatchers.anyString());
         // then
-        Assertions.assertEquals(checkCouunt, nickNameCount);
+        Assertions.assertFalse(isNotUsedNicname);
     }
 
     @Test
     @DisplayName("회원가입")
-    void test_saveMemberInfo() throws Exception {
+    void test_saveMemberInfo() {
         int checkCouunt = 1;
         // given
         Member member = Member.builder()
@@ -74,7 +71,7 @@ class MemberServiceUnitTest {
 
     @Test
     @DisplayName("MemberId로 회원정보 조회")
-    void test_findByMemberId() throws Exception {
+    void test_findByMemberId() {
         Login returnDTO = new Login("memberTest", "test1234");
         // given
         Mockito.when(memberMapper.findByMemberId(ArgumentMatchers.anyString()))
