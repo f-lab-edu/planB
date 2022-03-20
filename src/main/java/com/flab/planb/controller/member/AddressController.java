@@ -31,7 +31,7 @@ public class AddressController {
 
     @PostMapping("")
     public ResponseEntity<?> address(@RequestBody @Valid Address address) {
-        if (isNotExistingMember(address.getMemberId())) {
+        if (addressService.isNotExistingMember(address.getMemberId())) {
             return responseEntityBuilder.get(HttpStatus.BAD_REQUEST, MessageSet.VALID_FAIL);
         }
 
@@ -42,27 +42,29 @@ public class AddressController {
 
     @GetMapping("/{memberId}")
     public ResponseEntity<?> getAddressList(@PathVariable long memberId) {
-        if (isNotExistingMember(memberId)) {
+        if (addressService.isNotExistingMember(memberId)) {
             return responseEntityBuilder.get(HttpStatus.BAD_REQUEST, MessageSet.VALID_FAIL);
         }
 
-        return responseEntityBuilder.get(HttpStatus.OK, MessageSet.SELECT_SUCCEED,
-                                         Map.of("result", addressService.findByMemberId(memberId)));
+        return responseEntityBuilder.get(
+            HttpStatus.OK, MessageSet.SELECT_SUCCEED,
+            Map.of("result", addressService.findByMemberId(memberId)));
     }
 
     @GetMapping("/{memberId}/{addressId}")
     public ResponseEntity<?> getOneAddress(@PathVariable long memberId, @PathVariable("addressId") long id) {
-        if (notFoundedInformation(memberId, id)) {
+        if (addressService.notFoundedInformation(memberId, id)) {
             return responseEntityBuilder.get(HttpStatus.BAD_REQUEST, MessageSet.VALID_FAIL);
         }
 
-        return responseEntityBuilder.get(HttpStatus.OK, MessageSet.SELECT_SUCCEED,
-                                         Map.of("result", addressService.findByMemberIdAndId(memberId, id)));
+        return responseEntityBuilder.get(
+            HttpStatus.OK, MessageSet.SELECT_SUCCEED,
+            Map.of("result", addressService.findByMemberIdAndId(memberId, id)));
     }
 
     @DeleteMapping("/{memberId}/{addressId}")
     public ResponseEntity<?> deleteAddress(@PathVariable long memberId, @PathVariable("addressId") long id) {
-        if (notFoundedInformation(memberId, id)) {
+        if (addressService.notFoundedInformation(memberId, id)) {
             return responseEntityBuilder.get(HttpStatus.BAD_REQUEST, MessageSet.VALID_FAIL);
         }
 
@@ -74,7 +76,7 @@ public class AddressController {
     @PatchMapping("/{memberId}/{addressId}")
     public ResponseEntity<?> patchAddress(@PathVariable long memberId, @PathVariable("addressId") long id,
                                           @RequestBody AddressRequest param) {
-        if (notFoundedInformation(memberId, id)) {
+        if (addressService.notFoundedInformation(memberId, id)) {
             return responseEntityBuilder.get(HttpStatus.BAD_REQUEST, MessageSet.VALID_FAIL);
         }
 
@@ -83,18 +85,6 @@ public class AddressController {
         addressService.updateAddress(param);
 
         return responseEntityBuilder.get(HttpStatus.OK, MessageSet.UPDATE_SUCCEED);
-    }
-
-    private boolean notFoundedInformation(long memberId, long id) {
-        return isNotExistingMember(memberId) || isNotExistingAddress(memberId, id);
-    }
-
-    private boolean isNotExistingMember(long memberId) {
-        return addressService.existById(memberId) == 0;
-    }
-
-    private boolean isNotExistingAddress(long memberId, long id) {
-        return addressService.existByMemberIdAndId(memberId, id) == 0;
     }
 
 }

@@ -1,17 +1,21 @@
 package com.flab.planb.config;
 
-import com.flab.planb.batch.push.PushBatchInjectObject;
+import com.flab.planb.batch.ThreadPoolTaskExecutorCreator;
 import com.flab.planb.batch.push.PushItemWriter;
 import com.flab.planb.batch.push.Pusher;
 import com.flab.planb.dto.push.PushInfo;
+import com.flab.planb.response.message.MessageLookup;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.batch.MyBatisPagingItemReader;
 import org.mybatis.spring.batch.builder.MyBatisPagingItemReaderBuilder;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -30,12 +34,22 @@ import java.util.Map;
 @Slf4j
 public class PushBatchConfig {
 
-    private final PushBatchInjectObject injectObject;
+    private final JobBuilderFactory jobBuilderFactory;
+    private final StepBuilderFactory stepBuilderFactory;
+    private final SqlSessionFactory sqlSessionFactory;
+    private final ThreadPoolTaskExecutorCreator executorCreator;
     private final Pusher<PushInfo> pusher;
+    private final MessageLookup messageLookup;
     private final int chunkSize;
 
-    public PushBatchConfig(PushBatchInjectObject injectObject, @Value("${batch.chunk-size}") int chunkSize) {
-        this.injectObject = injectObject;
+    public PushBatchConfig(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory,
+                           SqlSessionFactory sqlSessionFactory, ThreadPoolTaskExecutorCreator executorCreator,
+                           MessageLookup messageLookup, @Value("${batch.chunk-size}") int chunkSize) {
+        this.jobBuilderFactory = jobBuilderFactory;
+        this.stepBuilderFactory = stepBuilderFactory;
+        this.sqlSessionFactory = sqlSessionFactory;
+        this.executorCreator = executorCreator;
+        this.messageLookup = messageLookup;
         this.chunkSize = chunkSize;
         this.pusher = new Pusher<>();
     }
@@ -53,41 +67,41 @@ public class PushBatchConfig {
 
     @Bean
     public Job pushJob() {
-        return injectObject.getJobBuilderFactory()
-                           .get(StaticValue.JOB_NAME)
-                           .preventRestart()
-                           .start(pushStep())
-                           .next(saveFailInfo())
-                           .build();
+        return jobBuilderFactory
+            .get(StaticValue.JOB_NAME)
+            .preventRestart()
+            .start(pushStep())
+            .next(saveFailInfo())
+            .build();
     }
 
     @Bean
     public Step pushStep() {
-        return injectObject.getStepBuilderFactory()
-                           .get(StaticValue.STEP_NAME)
-                           .<PushInfo, PushInfo>chunk(chunkSize)
-                           .reader(mybatisItemReader())
-                           .writer(itemWriter())
-                           .taskExecutor(taskExecutor())
-                           .build();
+        return stepBuilderFactory
+            .get(StaticValue.STEP_NAME)
+            .<PushInfo, PushInfo>chunk(chunkSize)
+            .reader(mybatisItemReader())
+            .writer(itemWriter())
+            .taskExecutor(taskExecutor())
+            .build();
     }
 
     @Bean
     public Step saveFailInfo() {
-        return injectObject.getStepBuilderFactory()
-                           .get(StaticValue.FAIL_STEP_NAME)
-                           .tasklet((contribution, chunkContext) -> {
-                               pusher.getFailedList().forEach(item -> log.info(item.toString()));
-                               pusher.resetFailList();
-                               return RepeatStatus.FINISHED;
-                           }).build();
+        return stepBuilderFactory
+            .get(StaticValue.FAIL_STEP_NAME)
+            .tasklet((contribution, chunkContext) -> {
+                pusher.getFailedList().forEach(item -> log.info(item.toString()));
+                pusher.resetFailList();
+                return RepeatStatus.FINISHED;
+            }).build();
     }
 
     @Bean
     public MyBatisPagingItemReader<PushInfo> mybatisItemReader() {
         return new MyBatisPagingItemReaderBuilder<PushInfo>()
             .pageSize(chunkSize)
-            .sqlSessionFactory(injectObject.getSqlSessionFactory())
+            .sqlSessionFactory(sqlSessionFactory)
             .queryId(StaticValue.QUERY_ID)
             .parameterValues(createParameterValues())
             .build();
@@ -95,12 +109,12 @@ public class PushBatchConfig {
 
     @Bean
     public PushItemWriter<PushInfo> itemWriter() {
-        return new PushItemWriter<>(pusher, injectObject.getMessageLookup().getMessage(StaticValue.PUSH_TITLE));
+        return new PushItemWriter<>(pusher, messageLookup.getMessage(StaticValue.PUSH_TITLE));
     }
 
     @Bean
     public TaskExecutor taskExecutor() {
-        return injectObject.getExecutorCreator().create(StaticValue.THREAD_NAME_PREFIX);
+        return executorCreator.create(StaticValue.THREAD_NAME_PREFIX);
     }
 
     private Map<String, Object> createParameterValues() {

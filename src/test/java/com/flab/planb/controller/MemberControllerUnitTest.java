@@ -1,16 +1,16 @@
 package com.flab.planb.controller;
 
 import ch.qos.logback.core.joran.spi.JoranException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flab.planb.TestUtils;
 import com.flab.planb.controller.member.MemberController;
-import com.flab.planb.response.message.MessageLookup;
+import com.flab.planb.dto.member.Member;
 import com.flab.planb.exception.ExceptionAdvice;
 import com.flab.planb.response.ResponseEntityBuilder;
-import com.flab.planb.dto.member.Member;
+import com.flab.planb.response.message.MessageLookup;
 import com.flab.planb.service.member.MemberService;
 import java.io.FileNotFoundException;
-import org.hamcrest.core.IsEqual;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,17 +22,11 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.util.UriComponentsBuilder;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
 
 @PropertySource("file:src/main/resources/logback-dev.xml")
 public class MemberControllerUnitTest {
@@ -78,7 +72,7 @@ public class MemberControllerUnitTest {
     @DisplayName("사용 중인 MemberId 확인 - 사용 중으로 실패")
     void test_existence_memberId() throws Exception {
         // given
-        Mockito.when(memberService.countByMemberId(ArgumentMatchers.anyString())).thenReturn(1);
+        Mockito.when(memberService.isNotUsedMemberId(ArgumentMatchers.anyString())).thenReturn(false);
         // when
         ResultActions actions = TestUtils.requestGet(mockMvc, URI + "/member-id?check=" + member.getMemberId(), null);
         // then
@@ -89,7 +83,7 @@ public class MemberControllerUnitTest {
     @DisplayName("사용 중인 MemberId 확인 - 미사용으로 성공")
     void test_not_existence_memberId() throws Exception {
         // given
-        Mockito.when(memberService.countByMemberId(ArgumentMatchers.anyString())).thenReturn(0);
+        Mockito.when(memberService.isNotUsedMemberId(ArgumentMatchers.anyString())).thenReturn(true);
         // when
         ResultActions actions = TestUtils.requestGet(mockMvc, URI + "/member-id?check=" + member.getMemberId(), null);
         // then
@@ -100,7 +94,7 @@ public class MemberControllerUnitTest {
     @DisplayName("사용 중인 Nickname 확인 - 사용 중으로 실패")
     void test_existence_nickname() throws Exception {
         // given
-        Mockito.when(memberService.countByNickName(ArgumentMatchers.anyString())).thenReturn(1);
+        Mockito.when(memberService.isNotUsedNicname(ArgumentMatchers.anyString())).thenReturn(false);
         // when
         ResultActions actions = TestUtils.requestGet(mockMvc, URI + "/nickname?check=" + member.getNickname(), null);
         // then
@@ -111,7 +105,7 @@ public class MemberControllerUnitTest {
     @DisplayName("사용 중인 Nickname 확인 - 미사용으로 성공")
     void test_not_existence_nickname() throws Exception {
         // given
-        Mockito.when(memberService.countByNickName(ArgumentMatchers.anyString())).thenReturn(0);
+        Mockito.when(memberService.isNotUsedNicname(ArgumentMatchers.anyString())).thenReturn(true);
         // when
         ResultActions actions = TestUtils.requestGet(mockMvc, URI + "/nickname?check=" + member.getNickname(), null);
         // then
@@ -122,8 +116,8 @@ public class MemberControllerUnitTest {
     @DisplayName("회원가입 실패")
     void test_signup_failed() throws Exception {
         // given
-        Mockito.when(memberService.countByMemberId(ArgumentMatchers.anyString())).thenReturn(1);
-        Mockito.when(memberService.countByNickName(ArgumentMatchers.anyString())).thenReturn(1);
+        Mockito.when(memberService.isNotUsedMemberId(ArgumentMatchers.anyString())).thenReturn(false);
+        Mockito.when(memberService.isNotUsedNicname(ArgumentMatchers.anyString())).thenReturn(false);
         // when
         ResultActions actions = TestUtils.requestPost(mockMvc, URI, member);
         // then
@@ -134,8 +128,8 @@ public class MemberControllerUnitTest {
     @DisplayName("회원가입 성공")
     void test_signup_succeed() throws Exception {
         // given
-        Mockito.when(memberService.countByMemberId(ArgumentMatchers.anyString())).thenReturn(0);
-        Mockito.when(memberService.countByNickName(ArgumentMatchers.anyString())).thenReturn(0);
+        Mockito.when(memberService.isNotUsedMemberId(ArgumentMatchers.anyString())).thenReturn(true);
+        Mockito.when(memberService.isNotUsedNicname(ArgumentMatchers.anyString())).thenReturn(true);
         // when
         ResultActions actions = TestUtils.requestPost(mockMvc, URI, member);
         // then

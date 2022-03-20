@@ -18,16 +18,24 @@ public class MemberService {
         memberMapper.saveMemberInfo(member);
     }
 
-    public int countByMemberId(String memberId) {
-        return memberMapper.countByMemberId(memberId);
+    public boolean isNotUsedMemberId(String sqlParameter) {
+        return countByMemberId(sqlParameter) == 0;
     }
 
-    public int countByNickName(String nickName) {
-        return memberMapper.countByNickName(nickName);
+    public boolean isNotUsedNicname(String sqlParameter) {
+        return countByNickName(sqlParameter) == 0;
     }
 
     public Login findByMemberId(String memberId) {
         return memberMapper.findByMemberId(memberId);
+    }
+
+    private int countByMemberId(String memberId) {
+        return memberMapper.countByMemberId(memberId);
+    }
+
+    private int countByNickName(String nickName) {
+        return memberMapper.countByNickName(nickName);
     }
 
 }

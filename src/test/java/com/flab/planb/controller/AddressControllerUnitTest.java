@@ -24,7 +24,6 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -71,7 +70,7 @@ public class AddressControllerUnitTest {
     @DisplayName("존재하지 않는 회원 ID 실패")
     void when_id_from_members_is_not_existed_expected_bad_request() throws Exception {
         // given
-        Mockito.when(addressService.existById(ArgumentMatchers.anyLong())).thenReturn(0);
+        Mockito.when(addressService.isNotExistingMember(ArgumentMatchers.anyLong())).thenReturn(true);
         // when
         ResultActions actions = TestUtils.requestPost(mockMvc, URI, address);
         // then
@@ -82,7 +81,7 @@ public class AddressControllerUnitTest {
     @DisplayName("배달주소 등록 성공")
     void when_new_address_expected_ok() throws Exception {
         // given
-        Mockito.when(addressService.existById(ArgumentMatchers.anyLong())).thenReturn(1);
+        Mockito.when(addressService.isNotExistingMember(ArgumentMatchers.anyLong())).thenReturn(false);
         // when
         ResultActions actions = TestUtils.requestPost(mockMvc, URI, address);
         // then
@@ -93,35 +92,35 @@ public class AddressControllerUnitTest {
     @DisplayName("배달주소 전체 조회")
     void when_find_all_address_expected_ok() throws Exception {
         // given
-        Mockito.when(addressService.existById(ArgumentMatchers.anyLong())).thenReturn(1);
+        Mockito.when(addressService.isNotExistingMember(ArgumentMatchers.anyLong())).thenReturn(false);
         Mockito.when(addressService.findByMemberId(ArgumentMatchers.anyLong())).thenReturn(ArgumentMatchers.anyList());
         // when
         ResultActions actions = TestUtils.requestGet(mockMvc, URI + "/" + address.getMemberId(), null);
         // then
         TestUtils.expectOk(actions, "조회에 성공하였습니다.");
-        TestUtils.expectNotEmpty(actions);
+        TestUtils.expectExist(actions);
     }
 
     @Test
-    @DisplayName("존재하지 않는 주소 실패")
-    void when_adress_is_not_existed_expected_bad_request() throws Exception {
+    @DisplayName("존재하지 않는 정보 실패")
+    void when_member_info_is_not_existed_expected_bad_request() throws Exception {
         // given
-        Mockito.when(addressService.existByMemberIdAndId(ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong()))
-               .thenReturn(0);
+        Mockito.when(addressService.notFoundedInformation(ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong()))
+               .thenReturn(true);
         // when
-        ResultActions actions = TestUtils.requestPost(mockMvc, URI, address);
+        ResultActions actions = TestUtils.requestGet(mockMvc,
+                                                     URI + "/" + address.getMemberId() + "/" + address.getId(),
+                                                     null);
         // then
         TestUtils.expectBadRequest(actions, "VALID_FAIL_001");
     }
-
 
     @Test
     @DisplayName("배달주소 단건 조회")
     void when_find_one_address_expected_ok() throws Exception {
         // given
-        Mockito.when(addressService.existById(ArgumentMatchers.anyLong())).thenReturn(1);
-        Mockito.when(addressService.existByMemberIdAndId(ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong()))
-               .thenReturn(1);
+        Mockito.when(addressService.notFoundedInformation(ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong()))
+               .thenReturn(false);
         Mockito.when(addressService.findByMemberIdAndId(ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong()))
                .thenReturn(address);
         // when
@@ -137,9 +136,8 @@ public class AddressControllerUnitTest {
     @DisplayName("배달주소 단건 삭제")
     void when_delete_one_address_expected_ok() throws Exception {
         // given
-        Mockito.when(addressService.existById(ArgumentMatchers.anyLong())).thenReturn(1);
-        Mockito.when(addressService.existByMemberIdAndId(ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong()))
-               .thenReturn(1);
+        Mockito.when(addressService.notFoundedInformation(ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong()))
+               .thenReturn(false);
         // when
         ResultActions actions = TestUtils.requestDelete(mockMvc,
                                                         URI + "/" + address.getMemberId() + "/" + address.getId(),
@@ -152,9 +150,8 @@ public class AddressControllerUnitTest {
     @DisplayName("배달주소 단건 수정")
     void when_patch_one_address_expected_ok() throws Exception {
         // given
-        Mockito.when(addressService.existById(ArgumentMatchers.anyLong())).thenReturn(1);
-        Mockito.when(addressService.existByMemberIdAndId(ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong()))
-               .thenReturn(1);
+        Mockito.when(addressService.notFoundedInformation(ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong()))
+               .thenReturn(false);
         // when
         ResultActions actions = TestUtils.requestPatch(mockMvc,
                                                        URI + "/" + address.getMemberId() + "/" + address.getId(),
