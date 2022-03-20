@@ -31,8 +31,12 @@ public class SubscriptionService {
         subscriptionMapper.saveSubscription(subscription);
     }
 
-    public int existsDuplicateSubscription(SubscriptionRequest subscriptionRequest) {
+    private int existsDuplicateSubscription(SubscriptionRequest subscriptionRequest) {
         return subscriptionMapper.existsDuplicateSubscription(subscriptionRequest);
+    }
+
+    public boolean isDuplicateSubscription(SubscriptionRequest subscriptionRequest) {
+        return existsDuplicateSubscription(subscriptionRequest) > 0;
     }
 
     public void saveSubscriptionMenus(List<SubscriptionMenu> menus) {

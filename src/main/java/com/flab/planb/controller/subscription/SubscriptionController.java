@@ -3,7 +3,8 @@ package com.flab.planb.controller.subscription;
 import com.flab.planb.response.ResponseEntityBuilder;
 import com.flab.planb.dto.subscription.request.SubscriptionRequest;
 import com.flab.planb.response.message.MessageSet;
-import com.flab.planb.service.shop.ShopInfoCheckService;
+import com.flab.planb.service.shop.ShopBusinessDayService;
+import com.flab.planb.service.shop.ShopInfoService;
 import com.flab.planb.service.subscription.SubscriptionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,13 +23,12 @@ import javax.validation.Valid;
 public class SubscriptionController {
 
     private final SubscriptionService subscriptionService;
+    private final ShopInfoService shopInfoService;
+    private final ShopBusinessDayService shopBusinessDayService;
     private final ResponseEntityBuilder responseEntityBuilder;
-    private final ShopInfoCheckService shopInfoCheckService;
 
     @PostMapping("")
     public ResponseEntity<?> regist(@RequestBody @Valid SubscriptionRequest request) {
-        log.debug(request.toString());
-
         if (canNotSubscribe(request)) {
             return responseEntityBuilder.get(HttpStatus.BAD_REQUEST, MessageSet.VALID_FAIL);
         }
@@ -39,11 +39,9 @@ public class SubscriptionController {
     }
 
     private boolean canNotSubscribe(SubscriptionRequest subscriptionRequest) {
-        return shopInfoCheckService.isNotAvailable(subscriptionRequest) || isDuplicateSubscription(subscriptionRequest);
-    }
-
-    private boolean isDuplicateSubscription(SubscriptionRequest subscriptionRequest) {
-        return subscriptionService.existsDuplicateSubscription(subscriptionRequest) > 0;
+        return shopInfoService.isNotExist(subscriptionRequest)
+            || shopBusinessDayService.isNotAvailable(subscriptionRequest)
+            || subscriptionService.isDuplicateSubscription(subscriptionRequest);
     }
 
 }
