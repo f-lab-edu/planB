@@ -25,11 +25,11 @@ public class AddressService {
     }
 
     public boolean isNotExistingMember(long memberId) {
-        return existById(memberId) == 0;
+        return addressMapper.existById(memberId) == 0;
     }
 
     public boolean isNotExistingAddress(long memberId, long id) {
-        return existByMemberIdAndId(memberId, id) == 0;
+        return addressMapper.existByMemberIdAndId(Map.of("memberId", memberId, "id", id)) == 0;
     }
 
     public List<Address> findByMemberId(long memberId) {
@@ -46,14 +46,6 @@ public class AddressService {
 
     public void updateAddress(AddressRequest param) {
         addressMapper.updateAddress(param);
-    }
-
-    private int existById(long memberId) {
-        return addressMapper.existById(memberId);
-    }
-
-    private int existByMemberIdAndId(long memberId, long id) {
-        return addressMapper.existByMemberIdAndId(Map.of("memberId", memberId, "id", id));
     }
 
 }

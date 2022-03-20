@@ -14,12 +14,7 @@ public class ShopInfoService {
     private final ShopInfoMapper shopInfoMapper;
 
     public boolean isNotExist(Subscription subscription) {
-        return existsByShopId(subscription.getShopId()) == 0;
+        return shopInfoMapper.existsByShopId(subscription.getShopId()) == 0;
     }
-
-    private int existsByShopId(long shopId) {
-        return shopInfoMapper.existsByShopId(shopId);
-    }
-
-
+    
 }
