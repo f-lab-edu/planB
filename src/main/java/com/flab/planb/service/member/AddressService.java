@@ -20,12 +20,16 @@ public class AddressService {
         addressMapper.saveAddress(address);
     }
 
-    public int existById(long memberId) {
-        return addressMapper.existById(memberId);
+    public boolean notFoundedInformation(long memberId, long id) {
+        return isNotExistingMember(memberId) || isNotExistingAddress(memberId, id);
     }
 
-    public int existByMemberIdAndId(long memberId, long id) {
-        return addressMapper.existByMemberIdAndId(Map.of("memberId", memberId, "id", id));
+    public boolean isNotExistingMember(long memberId) {
+        return existById(memberId) == 0;
+    }
+
+    public boolean isNotExistingAddress(long memberId, long id) {
+        return existByMemberIdAndId(memberId, id) == 0;
     }
 
     public List<Address> findByMemberId(long memberId) {
@@ -43,4 +47,13 @@ public class AddressService {
     public void updateAddress(AddressRequest param) {
         addressMapper.updateAddress(param);
     }
+
+    private int existById(long memberId) {
+        return addressMapper.existById(memberId);
+    }
+
+    private int existByMemberIdAndId(long memberId, long id) {
+        return addressMapper.existByMemberIdAndId(Map.of("memberId", memberId, "id", id));
+    }
+
 }

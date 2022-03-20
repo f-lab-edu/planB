@@ -28,7 +28,7 @@ public class MemberController {
 
     @GetMapping(value = "/member-id")
     public ResponseEntity<?> isExistMemberId(@RequestParam("check") @NotBlank String memberId) {
-        return isCountByMemberIdZero(memberId)
+        return memberService.isNotUsedMemberId(memberId)
                ? responseEntityBuilder.get(HttpStatus.OK, MessageSet.VALID_SUCCEED)
                : responseEntityBuilder.get(HttpStatus.BAD_REQUEST, MessageSet.VALID_OVERLAP,
                                            new String[]{"text.id"});
@@ -36,7 +36,7 @@ public class MemberController {
 
     @GetMapping(value = "/nickname")
     public ResponseEntity<?> isExistNickname(@RequestParam("check") @NotBlank String nickname) {
-        return isCountByNickNameZero(nickname)
+        return memberService.isNotUsedNicname(nickname)
                ? responseEntityBuilder.get(HttpStatus.OK, MessageSet.VALID_SUCCEED)
                : responseEntityBuilder.get(HttpStatus.BAD_REQUEST, MessageSet.VALID_OVERLAP,
                                            new String[]{"text.nickname"});
@@ -44,23 +44,14 @@ public class MemberController {
 
     @PostMapping("")
     public ResponseEntity<?> signUp(@RequestBody @Valid Member member) {
-        log.debug(member.toString());
-
-        if (!isCountByMemberIdZero(member.getMemberId()) || !isCountByNickNameZero(member.getNickname())) {
+        if (!memberService.isNotUsedMemberId(member.getMemberId())
+            || !memberService.isNotUsedNicname(member.getNickname())) {
             return responseEntityBuilder.get(HttpStatus.BAD_REQUEST, MessageSet.INSERT_FAIL_DATA);
         }
 
         memberService.saveMemberInfo(member);
 
         return responseEntityBuilder.get(HttpStatus.OK, MessageSet.INSERT_SUCCEED);
-    }
-
-    private boolean isCountByMemberIdZero(String sqlParameter) {
-        return memberService.countByMemberId(sqlParameter) == 0;
-    }
-
-    private boolean isCountByNickNameZero(String sqlParameter) {
-        return memberService.countByNickName(sqlParameter) == 0;
     }
 
 }

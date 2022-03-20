@@ -54,6 +54,14 @@ public class TestUtils {
         actions.andExpect(MockMvcResultMatchers.jsonPath("$.data.result").isNotEmpty());
     }
 
+    public static void expectExist(ResultActions actions) throws Exception {
+        expectExist(actions, "$.data.result");
+    }
+
+    public static void expectExist(ResultActions actions, String path) throws Exception {
+        actions.andExpect(MockMvcResultMatchers.jsonPath(path).exists());
+    }
+
     private static ResultActions getResultActionsRequest(MockMvc mockMvc, MockHttpServletRequestBuilder requestBuilder,
                                                          Object object) throws Exception {
         return mockMvc.perform(requestBuilder.contentType(MediaType.APPLICATION_JSON_UTF8)
