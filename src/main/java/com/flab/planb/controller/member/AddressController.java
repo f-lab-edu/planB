@@ -3,7 +3,7 @@ package com.flab.planb.controller.member;
 import com.flab.planb.response.ResponseEntityBuilder;
 import com.flab.planb.dto.member.Address;
 import com.flab.planb.dto.member.request.AddressRequest;
-import com.flab.planb.response.message.MessageSet;
+import com.flab.planb.response.message.MessageType;
 import com.flab.planb.service.member.AddressService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,59 +32,59 @@ public class AddressController {
     @PostMapping("")
     public ResponseEntity<?> address(@RequestBody @Valid Address address) {
         if (addressService.isNotExistingMember(address.getMemberId())) {
-            return responseEntityBuilder.get(HttpStatus.BAD_REQUEST, MessageSet.VALID_FAIL);
+            return responseEntityBuilder.get(HttpStatus.BAD_REQUEST, MessageType.VALID_FAIL);
         }
 
         addressService.saveAddress(address);
 
-        return responseEntityBuilder.get(HttpStatus.OK, MessageSet.INSERT_SUCCEED);
+        return responseEntityBuilder.get(HttpStatus.OK, MessageType.INSERT_SUCCEED);
     }
 
     @GetMapping("/{memberId}")
     public ResponseEntity<?> getAddressList(@PathVariable long memberId) {
         if (addressService.isNotExistingMember(memberId)) {
-            return responseEntityBuilder.get(HttpStatus.BAD_REQUEST, MessageSet.VALID_FAIL);
+            return responseEntityBuilder.get(HttpStatus.BAD_REQUEST, MessageType.VALID_FAIL);
         }
 
         return responseEntityBuilder.get(
-            HttpStatus.OK, MessageSet.SELECT_SUCCEED,
+            HttpStatus.OK, MessageType.SELECT_SUCCEED,
             Map.of("result", addressService.findByMemberId(memberId)));
     }
 
     @GetMapping("/{memberId}/{addressId}")
     public ResponseEntity<?> getOneAddress(@PathVariable long memberId, @PathVariable("addressId") long id) {
         if (addressService.notFoundedInformation(memberId, id)) {
-            return responseEntityBuilder.get(HttpStatus.BAD_REQUEST, MessageSet.VALID_FAIL);
+            return responseEntityBuilder.get(HttpStatus.BAD_REQUEST, MessageType.VALID_FAIL);
         }
 
         return responseEntityBuilder.get(
-            HttpStatus.OK, MessageSet.SELECT_SUCCEED,
+            HttpStatus.OK, MessageType.SELECT_SUCCEED,
             Map.of("result", addressService.findByMemberIdAndId(memberId, id)));
     }
 
     @DeleteMapping("/{memberId}/{addressId}")
     public ResponseEntity<?> deleteAddress(@PathVariable long memberId, @PathVariable("addressId") long id) {
         if (addressService.notFoundedInformation(memberId, id)) {
-            return responseEntityBuilder.get(HttpStatus.BAD_REQUEST, MessageSet.VALID_FAIL);
+            return responseEntityBuilder.get(HttpStatus.BAD_REQUEST, MessageType.VALID_FAIL);
         }
 
         addressService.deleteByMemberIdAndId(memberId, id);
 
-        return responseEntityBuilder.get(HttpStatus.OK, MessageSet.DELETE_SUCCEED);
+        return responseEntityBuilder.get(HttpStatus.OK, MessageType.DELETE_SUCCEED);
     }
 
     @PatchMapping("/{memberId}/{addressId}")
     public ResponseEntity<?> patchAddress(@PathVariable long memberId, @PathVariable("addressId") long id,
                                           @RequestBody AddressRequest param) {
         if (addressService.notFoundedInformation(memberId, id)) {
-            return responseEntityBuilder.get(HttpStatus.BAD_REQUEST, MessageSet.VALID_FAIL);
+            return responseEntityBuilder.get(HttpStatus.BAD_REQUEST, MessageType.VALID_FAIL);
         }
 
         param.setId(id);
         param.setMemberId(memberId);
         addressService.updateAddress(param);
 
-        return responseEntityBuilder.get(HttpStatus.OK, MessageSet.UPDATE_SUCCEED);
+        return responseEntityBuilder.get(HttpStatus.OK, MessageType.UPDATE_SUCCEED);
     }
 
 }
