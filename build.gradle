@@ -4,7 +4,7 @@ plugins {
 }
 
 def ver = [
-        spring        : '5.3.17',
+        spring        : '5.3.18',
         springSecurity: '5.6.1',
         springBatch   : '4.3.5',
         servletAPI    : '4.0.1',
