@@ -1,6 +1,6 @@
 package com.flab.planb.dto.response;
 
-import com.flab.planb.response.message.MessageSet;
+import com.flab.planb.response.message.MessageType;
 import com.flab.planb.response.message.ResponseMessage;
 import lombok.Getter;
 import lombok.ToString;
@@ -12,8 +12,8 @@ public class OtherResponseEntityParam extends ResponseEntityParam {
 
     private final Map<String, ?> data;
 
-    public OtherResponseEntityParam(MessageSet messageSet, String[] messageArg, Map<String, ?> data) {
-        super(messageSet, messageArg);
+    public OtherResponseEntityParam(MessageType messageType, String[] messageArg, Map<String, ?> data) {
+        super(messageType, messageArg);
         this.data = data;
     }
 

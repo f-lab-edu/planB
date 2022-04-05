@@ -2,7 +2,7 @@ package com.flab.planb.controller.subscription;
 
 import com.flab.planb.response.ResponseEntityBuilder;
 import com.flab.planb.dto.subscription.request.SubscriptionRequest;
-import com.flab.planb.response.message.MessageSet;
+import com.flab.planb.response.message.MessageType;
 import com.flab.planb.service.shop.ShopBusinessDayService;
 import com.flab.planb.service.shop.ShopInfoService;
 import com.flab.planb.service.subscription.SubscriptionService;
@@ -30,12 +30,12 @@ public class SubscriptionController {
     @PostMapping("")
     public ResponseEntity<?> regist(@RequestBody @Valid SubscriptionRequest request) {
         if (canNotSubscribe(request)) {
-            return responseEntityBuilder.get(HttpStatus.BAD_REQUEST, MessageSet.VALID_FAIL);
+            return responseEntityBuilder.get(HttpStatus.BAD_REQUEST, MessageType.VALID_FAIL);
         }
 
         subscriptionService.saveSubscriptionInfo(request);
 
-        return responseEntityBuilder.get(HttpStatus.OK, MessageSet.INSERT_SUCCEED);
+        return responseEntityBuilder.get(HttpStatus.OK, MessageType.INSERT_SUCCEED);
     }
 
     private boolean canNotSubscribe(SubscriptionRequest subscriptionRequest) {

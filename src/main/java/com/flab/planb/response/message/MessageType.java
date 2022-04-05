@@ -4,7 +4,7 @@ import com.flab.planb.response.ResponseResult;
 import lombok.Getter;
 
 @Getter
-public enum MessageSet {
+public enum MessageType {
     FAIL("error.fail.001", "FAIL_001", ResponseResult.ERROR),
     VALID_FAIL("error.valid.001", "VALID_FAIL_001", ResponseResult.ERROR),
     VALID_OVERLAP("error.valid.002", "VALID_FAIL_002", ResponseResult.ERROR),
@@ -24,7 +24,7 @@ public enum MessageSet {
     private final String code;
     private final ResponseResult responseResult;
 
-    MessageSet(String lookupKey, String code, ResponseResult responseResult) {
+    MessageType(String lookupKey, String code, ResponseResult responseResult) {
         this.lookupKey = lookupKey;
         this.code = code;
         this.responseResult = responseResult;

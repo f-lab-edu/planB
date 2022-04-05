@@ -1,6 +1,6 @@
 package com.flab.planb.exception;
 
-import com.flab.planb.response.message.MessageSet;
+import com.flab.planb.response.message.MessageType;
 import com.flab.planb.response.ResponseEntityBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +26,7 @@ public class ExceptionAdvice {
                      "MethodArgumentNotValidException URI : {} | message : {}",
                      request.getRequestURI(), error.getDefaultMessage()));
 
-        return responseEntityBuilder.get(HttpStatus.BAD_REQUEST, MessageSet.VALID_FAIL);
+        return responseEntityBuilder.get(HttpStatus.BAD_REQUEST, MessageType.VALID_FAIL);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
@@ -34,7 +34,7 @@ public class ExceptionAdvice {
                                                   HttpServletRequest request) {
         log.error("IllegalArgumentException URI : {} | message : {}", request.getRequestURI(), exception.getMessage());
 
-        return responseEntityBuilder.get(HttpStatus.BAD_REQUEST, MessageSet.VALID_FAIL);
+        return responseEntityBuilder.get(HttpStatus.BAD_REQUEST, MessageType.VALID_FAIL);
     }
 
 }

@@ -40,6 +40,13 @@ public class TestUtils {
                .andExpect(MockMvcResultMatchers.jsonPath("$.data.errorCode").value(IsEqual.equalTo(errorCode)));
     }
 
+
+    public static void expectInternalServerError(ResultActions actions, String errorCode) throws Exception {
+        actions.andExpect(MockMvcResultMatchers.status().isInternalServerError())
+               .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8))
+               .andExpect(MockMvcResultMatchers.jsonPath("$.data.errorCode").value(IsEqual.equalTo(errorCode)));
+    }
+
     public static void expectOk(ResultActions actions, String statusMessage) throws Exception {
         expectEqual(actions, "$.statusMessage", statusMessage);
     }

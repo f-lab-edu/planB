@@ -2,7 +2,7 @@ package com.flab.planb.security;
 
 import com.flab.planb.response.message.MessageLookup;
 import com.flab.planb.response.ResponseWriter;
-import com.flab.planb.response.message.MessageSet;
+import com.flab.planb.response.message.MessageType;
 import com.flab.planb.response.message.ResponseMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -30,7 +30,7 @@ public class SecurityAuthenticationEntryPoint implements AuthenticationEntryPoin
         responseWriter.setHeader(response, HttpStatus.UNAUTHORIZED);
         response.getWriter()
                 .write(responseWriter.messageToString(
-                    new ResponseMessage(messageLookup.getMessage(MessageSet.AUTH_FAIL.getLookupKey()),
-                                        Map.of("errorCode", MessageSet.AUTH_FAIL.getCode()))));
+                    new ResponseMessage(messageLookup.getMessage(MessageType.AUTH_FAIL.getLookupKey()),
+                                        Map.of("errorCode", MessageType.AUTH_FAIL.getCode()))));
     }
 }

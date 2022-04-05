@@ -1,6 +1,6 @@
 package com.flab.planb.dto.response;
 
-import com.flab.planb.response.message.MessageSet;
+import com.flab.planb.response.message.MessageType;
 import com.flab.planb.response.message.ResponseMessage;
 import lombok.ToString;
 import java.util.Map;
@@ -8,8 +8,8 @@ import java.util.Map;
 @ToString
 public class ErrorResponseEntityParam extends ResponseEntityParam {
 
-    public ErrorResponseEntityParam(MessageSet messageSet, String[] messageArg) {
-        super(messageSet, messageArg);
+    public ErrorResponseEntityParam(MessageType messageType, String[] messageArg) {
+        super(messageType, messageArg);
     }
 
     @Override
