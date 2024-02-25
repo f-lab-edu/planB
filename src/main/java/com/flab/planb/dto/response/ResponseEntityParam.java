@@ -1,6 +1,6 @@
 package com.flab.planb.dto.response;
 
-import com.flab.planb.response.message.MessageSet;
+import com.flab.planb.response.message.MessageType;
 import com.flab.planb.response.message.ResponseMessage;
 import lombok.Getter;
 import lombok.ToString;
@@ -9,11 +9,11 @@ import lombok.ToString;
 @ToString
 public abstract class ResponseEntityParam {
 
-    protected final MessageSet messageSet;
+    protected final MessageType messageType;
     protected String[] messageArg;
 
-    public ResponseEntityParam(MessageSet messageSet, String[] messageArg) {
-        this.messageSet = messageSet;
+    public ResponseEntityParam(MessageType messageType, String[] messageArg) {
+        this.messageType = messageType;
         this.messageArg = messageArg;
     }
 
